@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+plugin_name="$1"
+
+exit
+if [[ ! "$plugin_name" ]]; then
+    echo "Invalid arguments"
+    exit 1
+fi
+
+if [[ ! -d "/usr/local/vesta/web/plugins/$plugin_name" ]]; then
+    echo "Plugin \"$plugin_name\" is not installed"
+    exit 1
+fi
+
+plugin_path="/usr/local/vesta/web/plugins/$plugin_name"
+
+# Remove from CLI
+if [[ -d "$plugin_path/bin" ]]; then
+    for f in "$plugin_path/bin/"*; do
+        bin_name="$(basename -- "$f")"
+
+        if [[ -L "/usr/local/vesta/bin/$bin_name" ]]; then
+            rm -f "/usr/local/vesta/bin/$bin_name"
+        fi
+    done
+fi
+
+# Remove plugin files
+rm -rf "/usr/local/vesta/web/plugins/$plugin_name"
+
+echo "$plugin_name plugin was uninstalled"
+

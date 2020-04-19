@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+# Check if script is run as root
+if [[ "$(id -u)" != "0" ]]; then
+   echo "This script must be run as root" >&2
+   exit 1
+fi
+
+# Link para o zip no padrão do github archive
+github_link="$1"
+github_link="$(echo "$github_link" | sed -E "s|.git$||")"
+
+if [[ ! "$(echo "$github_link" | grep -E "^https://github.com/[^/]*/[^/]*$")" ]]; then
+    echo "Invalida github URL"
+    exit
+elif [[ ! "$(curl -L -I -s "$github_link" | grep -E "HTTP/(.*)200")" ]]; then
+    echo "Github repository not found"
+    exit
+fi
+
+# Plugin name
+plugin_name="$(basename -- "$github_link")"
+# Archive link
+zip_link="$github_link/archive/master.zip"
+# Full path to the plugin
+plugin_path="/usr/local/vesta/web/plugins/$plugin_name"
+
+if [[ -d "$plugin_path" ]]; then
+    echo "There is already a plugin with that name"
+    exit 1
+fi
+
+if [[ ! "$(curl -L -I -s "$zip_link" | grep -E "HTTP/(.*)200")" \
+    || ! "$(curl -L -I -s "$zip_link" | grep -E "Content-Type: application/zip")" ]]; then
+    echo "Not found" >&2
+    exit
+fi
+
+# Install plugin zip
+curl -L -J "$zip_link" -o "/tmp/$plugin_name.zip"
+#first_level_directory="$(zipinfo -1 /tmp/$plugin_name.zip "*/" | grep -o "^[^/]\+[/]" | sort -u)"
+rm -rf "/tmp/$plugin_name-master"
+unzip "/tmp/$plugin_name.zip" -d "/tmp"
+mv "/tmp/$plugin_name-master" "/usr/local/vesta/web/plugins/$plugin_name"
+rm -rf "/tmp/$plugin_name.zip"
+
+#ln -s /usr/local/vesta/web/plugins/bin/* /usr/local/vesta/bin/
+
+# Create symbolic links to executables
+if [[ -d "$plugin_path/bin" ]]; then
+    for f in "$plugin_path/bin/"*; do
+        bin_name="$(basename -- "$f")"
+
+        chmod +x "$f"
+        ln -s "$f" /usr/local/vesta/bin
+    done
+fi
+
+# Check if plugin has additional configurations
+if [[ -f "$plugin_path/install.sh" ]]; then
+    bash "$plugin_path/install.sh"
+fi
+
+echo -e "\nInstallation completed"
