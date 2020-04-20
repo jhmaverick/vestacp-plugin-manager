@@ -4,5 +4,3 @@
 .gitattributes export-ignore
 .gitignore export-ignore
 .idea export-ignore
-LICENSE export-ignore
-readme.md export-ignore

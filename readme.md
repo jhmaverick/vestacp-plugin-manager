@@ -1,13 +1,15 @@
 # VestaCP Plugins
 
-This script adds to vesta the ability to work with plugins.
-
+This script adds to vesta the ability to work with plugins.\
+The plugins will be installed by Github repository.
 
 ## Installation
 
 ```bash
 curl -sL https://raw.githubusercontent.com/jhmaverick/vestacp-plugins/master/install.sh | bash -
 ```
+
+After installation a menu will be added to the vesta panel.
 
 
 ## Plugins structure
