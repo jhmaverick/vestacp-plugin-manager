@@ -1,4 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+if [[ "$(id -u)" != "0" ]]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+if [[ ! -d /usr/local/vesta ]]; then
+    echo "Vesta is not installed."
+    exit 1
+fi
 
 curl -L -J "https://github.com/jhmaverick/vestacp-plugins/archive/master.zip" -o "/tmp/vestacp-plugins.zip"
 
