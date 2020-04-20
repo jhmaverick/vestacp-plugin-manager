@@ -1,9 +1,14 @@
 /* Form */
-.vesta-plugins form {
-    padding-left: 148px;
+.vesta-plugins-add {
+    padding: 40px 40px 40px 148px;
+    box-sizing: border-box;
 }
 
-.vesta-plugins .show-checkbox {
+.vesta-plugins-add form {
+    padding-bottom: 40px;
+}
+
+.vesta-plugins-add .show-checkbox {
     display: block;
     float: left;
     margin-top: 1px;

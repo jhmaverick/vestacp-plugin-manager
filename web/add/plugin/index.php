@@ -18,7 +18,7 @@ include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
 top_panel($user, $TAB);
 
 // Start content block
-echo '<div class="l-center units vesta-plugins">';
+echo '<div class="l-center units vesta-plugins-add">';
 echo '<link rel="stylesheet" href="/css/plugin.css"/>';
 
 function default_template() {

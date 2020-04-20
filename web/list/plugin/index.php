@@ -72,17 +72,8 @@ foreach ($plugins as $plugin) {
 
                     if ($user == "admin") {
                         ?>
-                        <div class="actions-panel__col actions-panel__edit" key-action="js">
-                            <a id="reinstall_link_<?= $i ?>" class="data-controls do_delete">
-                                <?= __('reinstall') ?> <i class="do_delete"></i>
-                                <input type="hidden" name="delete_url"
-                                       value="/add/plugin/?action=reinstall&plugin-url=<?= urlencode($plugin_repository) ?>"/>
-                                <div id="delete_dialog_<?= $i ?>" class="confirmation-text-delete hidden"
-                                     title="<?= __('Confirmation') ?>">
-                                    <p class="confirmation"><?= __('Are you sure you want to reinstall the plugin %s?', $plugin_name) ?></p>
-                                </div>
-                            </a>
-                        </div>
+                        <div class="actions-panel__col actions-panel__edit" key-action="href"><a
+                                    href="/add/plugin/?action=reinstall&plugin-url=<?= urlencode($plugin_repository) ?>"><?= __('Reinstall') ?> <i></i></a></div>
 
                         <div class="actions-panel__col actions-panel__delete shortcut-delete" key-action="js">
                             <a id="delete_link_<?= $i ?>" class="data-controls do_delete">
