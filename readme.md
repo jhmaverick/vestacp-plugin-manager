@@ -2,25 +2,24 @@
 
 This script adds to vesta the ability to work with plugins.
 
-### Installation
 
-This script adds to vesta the ability to work with plugins
+## Installation
 
-* `wget https://github.com/jhmaverick/vestacp-app-installer/master/install.sh -O /tmp/vestacp-plugins-installer.sh`
-* `chmod +x /tmp/vestacp-plugins-installer.sh`
-* `sudo /tmp/vestacp-plugins-installer.sh`
+```bash
+curl -sL https://raw.githubusercontent.com/jhmaverick/vestacp-plugins/master/install.sh | bash -
+```
 
 
-## Plugin structure
+## Plugins structure
 
 Plugins will be installed in /usr/local/vesta/plugins
 
 Structure:
-* bin/: All files in this directory will be linked to vesta bin.
-* web/: A symbolic link will be created to this directory with the plugin name inside "vesta/web/plugins/".
-* install.sh: If it exists it will be executed after the standard installation.
-* uninstall.sh: If it exists it will be executed before the standard removal.
-* plugin.json: Information about the plugin.
+* **/bin/** - All files in this directory will be linked to vesta bin.
+* **/web/** - A symbolic link will be created to this directory with the plugin name inside "vesta/web/plugins/".
+* **/install.sh** - If it exists it will be executed after the standard installation.
+* **/uninstall.sh** - If it exists it will be executed before the standard removal.
+* **/plugin.json** - Information about the plugin.
 
 
 ## plugin.json

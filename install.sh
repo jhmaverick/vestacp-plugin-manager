@@ -23,6 +23,8 @@ cp -a /tmp/vestacp-plugins-master/func/* /usr/local/vesta/func
 cp -a /tmp/vestacp-plugins-master/web/* /usr/local/vesta/web
 
 source /usr/local/vesta/func/plugins.sh
-add_menu "Plugins" "/list/plugins/" "all"
+add_menu "Plugins" "/list/plugin/" "all"
 
 rm -rf "/tmp/vestacp-plugins-master"
+
+echo -e "\nInstallation completed"
