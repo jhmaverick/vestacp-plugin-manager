@@ -36,6 +36,7 @@ Structure:
   "author": {
     "name": "João Henrique",
     "email": "joao_henriquee@outlook.com",
+    "homepage": "https://github.com/jhmaverick/"
   }
 }
 ```
