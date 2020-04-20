@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# Link para o zip no padrão do github archive
+github_link="$1"
+reinstall="${2:-no}"
+github_link="$(echo "$github_link" | sed -E "s|.git$||")"
+
+if [[ ! "$(echo "$github_link" | grep -E "^https://github.com/[^/]*/[^/]*$")" ]]; then
+    echo "Invalida github URL"
+    exit
+elif [[ ! "$(curl -L -I -s "$github_link" | grep -E "HTTP/(.*)200")" ]]; then
+    echo "Github repository not found"
+    exit
+fi
+
+# Plugin name
+plugin_name="$(basename -- "$github_link")"
+# Archive link
+zip_link="$github_link/archive/master.zip"
+# Full path to the plugin
+plugin_path="/usr/local/vesta/plugins/$plugin_name"
+
+mkdir -p /usr/local/vesta/plugins
+mkdir -p /usr/local/vesta/web/plugins
+
+if [[ -d "$plugin_path" ]]; then
+    if [[ "${reinstall,,}" == "yes" || "${reinstall,,}" == "y" ]]; then
+        /usr/local/vesta/bin/v-delete-plugin "$plugin_name"
+    else
+        echo "There is already a plugin with that name"
+        exit 1
+    fi
+fi
+
+if [[ ! "$(curl -L -I -s "$zip_link" | grep -E "HTTP/(.*)200")" \
+    || ! "$(curl -L -I -s "$zip_link" | grep -E "Content-Type: application/zip")" ]]; then
+    echo "Not found" >&2
+    exit
+fi
+
+# Install plugin zip
+curl -L -J "$zip_link" -o "/tmp/$plugin_name.zip"
+#first_level_directory="$(zipinfo -1 /tmp/$plugin_name.zip "*/" | grep -o "^[^/]\+[/]" | sort -u)"
+rm -rf "/tmp/$plugin_name-master"
+unzip "/tmp/$plugin_name.zip" -d "/tmp"
+mv "/tmp/$plugin_name-master" "/usr/local/vesta/plugins/$plugin_name"
+rm -rf "/tmp/$plugin_name.zip"
+
+# Check installation
+if [[ "$(ls -A "/usr/local/vesta/plugins/$plugin_name")" ]]; then
+    if [[ -f /usr/local/vesta/conf/plugins.json && "$(cat /usr/local/vesta/conf/plugins.json | jq '.')" ]]; then
+        # Get plugins
+        plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
+    else
+        plugins_list="{}"
+    fi
+
+    if [[ -f "$plugin_path/plugin.json" && "$(cat "$plugin_path/plugin.json" | jq '.')" ]]; then
+        # Get data from plugin
+        plugin_data="$(cat "$plugin_path/plugin.json")"
+    else
+        plugin_data="{}"
+    fi
+
+    # Add installation data and update plugins list
+    plugin_data="$(echo "$plugin_data" | jq -r ".name = \"$plugin_name\" | .repository = \"$github_link\" | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
+    echo "$plugins_list {\"$plugin_name\": $plugin_data}" | jq -s ".[0] + .[1]" > /usr/local/vesta/conf/plugins.json
+
+    # Execute configuration for plugin in the vesta environment
+    /usr/local/vesta/bin/v-rebuild-plugin "$plugin_name"
+
+    # Check if plugin has additional configurations
+    if [[ -f "$plugin_path/install.sh" ]]; then
+        bash "$plugin_path/install.sh"
+    fi
+
+    echo -e "\nInstallation completed"
+else
+    rm -rf "/usr/local/vesta/plugins/$plugin_name"
+fi

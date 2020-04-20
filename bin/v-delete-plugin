@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+plugin_name="$1"
+
+if [[ ! "$plugin_name" ]]; then
+    echo "Invalid arguments"
+    exit 1
+elif [[ ! -d "/usr/local/vesta/plugins/$plugin_name" ]]; then
+    echo "Plugin \"$plugin_name\" is not installed"
+    exit 1
+fi
+
+plugin_path="/usr/local/vesta/plugins/$plugin_name"
+
+# Check if plugin has an uninstaller script
+if [[ -f "$plugin_path/uninstall.sh" ]]; then
+    bash "$plugin_path/uninstall.sh"
+fi
+
+# Remove from CLI
+if [[ -d "$plugin_path/bin" ]]; then
+    for f in "$plugin_path/bin/"*; do
+        bin_name="$(basename -- "$f")"
+
+        if [[ -L "/usr/local/vesta/bin/$bin_name" ]]; then
+            rm -f "/usr/local/vesta/bin/$bin_name"
+        fi
+    done
+fi
+
+# Remove web link
+if [[ -d "/usr/local/vesta/web/plugins/$plugin_name" ]]; then
+    unlink "/usr/local/vesta/web/plugins/$plugin_name"
+fi
+
+# Remove plugin files
+rm -rf "/usr/local/vesta/plugins/$plugin_name"
+
+# Remove from plugin plugin list
+if [[ -f /usr/local/vesta/conf/plugins.json && "$(cat /usr/local/vesta/conf/plugins.json)" ]]; then
+    plugin_data="$(cat "/usr/local/vesta/conf/plugins.json")"
+else
+    plugin_data="{}"
+fi
+
+echo "$plugin_data" | jq "del(.\"$plugin_name\")" > /usr/local/vesta/conf/plugins.json

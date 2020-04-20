@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+mapfile -t plugins < <(/usr/local/vesta/bin/v-list-plugins | awk '{print $1}')
+if [[ "${plugins[@]}" ]]; then
+    for plugin in "${plugins[@]}"; do
+        /usr/local/vesta/bin/v-rebuild-plugin "$plugin"
+    done
+fi

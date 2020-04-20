@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+type="${1:-text}"
+
+plugins_path="/usr/local/vesta/plugins"
+
+if [[ "$type" == "json" ]]; then
+    cat /usr/local/vesta/conf/plugins.json
+    exit
+fi
+
+plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
+for plugin in $(echo "${plugins_list}" | jq -r '.[] | @base64'); do
+    plugin="$(echo "$plugin" | base64 --decode)"
+    plugin_name="$(echo "$plugin" | jq -r '.name')"
+
+    /usr/local/vesta/bin/v-list-plugin "$plugin_name" "$type"
+done

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+plugin_name="$1"
+type="$2"
+
+plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
+plugin="$(echo "${plugins_list}" | jq -r ".\"$plugin_name\"")"
+
+if [[ "$plugin" && "$plugin" != "null" ]]; then
+    if [[ "$type" == "json" ]]; then
+        echo "$plugin"
+    else
+        plugin_repo="$(echo "$plugin" | jq -r '.repository')"
+        plugin_date="$(echo "$plugin" | jq -r '.date')"
+
+        echo -e "$plugin_name\t$plugin_repo\t$plugin_date"
+    fi
+fi
