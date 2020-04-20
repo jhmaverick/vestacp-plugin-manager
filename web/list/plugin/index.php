@@ -42,6 +42,7 @@ foreach ($plugins as $plugin) {
     $plugin_repository = (isset($plugin['repository']) && is_string($plugin['repository'])) ? $plugin['repository'] : "";
     $plugin_author_name = (isset($plugin['author']['name']) && is_string($plugin['author']['name'])) ? $plugin['author']['name'] : "";
     $plugin_author_email = (isset($plugin['author']['email']) && is_string($plugin['author']['email'])) ? $plugin['author']['email'] : "";
+    $plugin_author_homepage = (isset($plugin['author']['homepage']) && is_string($plugin['author']['homepage'])) ? $plugin['author']['homepage'] : "";
 
     // Check user role
     if ($plugin_role == 'admin' && $user != 'admin') {
@@ -65,7 +66,8 @@ foreach ($plugins as $plugin) {
                 <div class="actions-panel clearfix">
                     <?php if (!empty($plugin_web)) { ?>
                         <div class="actions-panel__col actions-panel__start shortcut-enter" key-action="href"><a
-                                    href="<?= $plugin_web ?>"><?= __('Go to plugin') ?> <i></i></a><span class="shortcut">&nbsp;&#8629;</span></div>
+                                    href="<?= $plugin_web ?>"><?= __('Go to plugin') ?> <i></i></a><span
+                                    class="shortcut">&nbsp;&#8629;</span></div>
                     <?php }
 
                     if ($user == "admin") {
@@ -135,7 +137,8 @@ foreach ($plugins as $plugin) {
                         </td>
                         <td>
                             <div class="l-unit__stat-cols clearfix last">
-                                <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Home Page') ?>:</div>
+                                <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Home Page') ?>:
+                                </div>
                                 <div class="l-unit__stat-col l-unit__stat-col--right">
                                     <b><a href="<?= $plugin_homepage ?>" target="_blank"><?= $plugin_homepage ?></a></b>
                                 </div>
@@ -148,7 +151,11 @@ foreach ($plugins as $plugin) {
                             <div class="l-unit__stat-cols clearfix last">
                                 <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Author') ?>:</div>
                                 <div class="l-unit__stat-col l-unit__stat-col--right">
-                                    <b><?= $plugin_author_name ?></b>
+                                    <?php if (!empty($plugin_author_homepage)) { ?>
+                                        <b><a href="<?= $plugin_author_homepage ?>" target="_blank"><?= $plugin_author_name ?></a></b>
+                                    <?php } else { ?>
+                                        <b><?= $plugin_author_name ?></b>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </td>
@@ -162,7 +169,8 @@ foreach ($plugins as $plugin) {
                         </td>
                         <td>
                             <div class="l-unit__stat-cols clearfix last">
-                                <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Repository') ?>:</div>
+                                <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Repository') ?>:
+                                </div>
                                 <div class="l-unit__stat-col l-unit__stat-col--right">
                                     <b><a href="<?= $plugin_repository ?>" target="_blank"><?= $plugin_repository ?></a></b>
                                 </div>
