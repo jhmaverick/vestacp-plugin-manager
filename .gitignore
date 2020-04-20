@@ -18,7 +18,7 @@
 # Informações do Modulo principal e seus Diretórios
 !/.idea/modules.xml
 !/.idea/vestacp.iml
-!/.idea/vestacp-app-installer.iml
+!/.idea/vestacp-plugins.iml
 !/.idea/webResources.xml
 
 # Configurações de execução
