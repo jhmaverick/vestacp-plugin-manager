@@ -50,7 +50,7 @@ foreach ($plugins as $plugin) {
     }
 
     // Check if plugins has a page
-    if (file_exists("/usr/local/vesta/web/plugins/$plugin_name")) {
+    if (file_exists("/usr/local/vesta/web/plugins/$plugin_name/index.php")) {
         $plugin_web = "/plugins/$plugin_name/";
         $display = "<a href=\"$plugin_web\">$plugin_name</a>";
     } else {
