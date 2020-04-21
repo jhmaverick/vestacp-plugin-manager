@@ -71,9 +71,12 @@ foreach ($plugins as $plugin) {
                     <?php }
 
                     if ($user == "admin") {
-                        ?>
-                        <div class="actions-panel__col actions-panel__edit" key-action="href"><a
-                                    href="/add/plugin/?action=reinstall&plugin-url=<?= urlencode($plugin_repository) ?>"><?= __('Reinstall') ?> <i></i></a></div>
+                        if (!empty($plugin_repository)) {
+                            ?>
+                            <div class="actions-panel__col actions-panel__edit" key-action="href"><a
+                                        href="/add/plugin/?action=reinstall&plugin-url=<?= urlencode($plugin_repository) ?>"><?= __('Reinstall') ?>
+                                    <i></i></a></div>
+                        <?php } ?>
 
                         <div class="actions-panel__col actions-panel__delete shortcut-delete" key-action="js">
                             <a id="delete_link_<?= $i ?>" class="data-controls do_delete">
@@ -143,7 +146,8 @@ foreach ($plugins as $plugin) {
                                 <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Author') ?>:</div>
                                 <div class="l-unit__stat-col l-unit__stat-col--right">
                                     <?php if (!empty($plugin_author_homepage)) { ?>
-                                        <b><a href="<?= $plugin_author_homepage ?>" target="_blank"><?= $plugin_author_name ?></a></b>
+                                        <b><a href="<?= $plugin_author_homepage ?>"
+                                              target="_blank"><?= $plugin_author_name ?></a></b>
                                     <?php } else { ?>
                                         <b><?= $plugin_author_name ?></b>
                                     <?php } ?>
