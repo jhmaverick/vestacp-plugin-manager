@@ -44,3 +44,33 @@ remove_menu() {
         sed -Ei "/<div class=\"l-menu__item.*href=\"$page_link\".*/d" "/usr/local/vesta/web/templates/$local/panel.html"
     fi
 }
+
+update_plugin_conf() {
+    local plugin_name="$1"
+    local repo_url="$2"
+
+    if [[ ! "$plugin_name" ]]; then
+        echo "Invalida arguments"
+        return
+    fi
+
+    plugin_path="/usr/local/vesta/plugins/$plugin_name"
+
+    if [[ -f /usr/local/vesta/conf/plugins.json && "$(cat /usr/local/vesta/conf/plugins.json | jq '.')" ]]; then
+        # Get plugins
+        plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
+    else
+        plugins_list="{}"
+    fi
+
+    if [[ -f "$plugin_path/plugin.json" && "$(cat "$plugin_path/plugin.json" | jq '.')" ]]; then
+        # Get data from plugin
+        plugin_data="$(cat "$plugin_path/plugin.json")"
+    else
+        plugin_data="{}"
+    fi
+
+    # Add installation data and update plugins list
+    plugin_data="$(echo "$plugin_data" | jq -r ".name = \"$plugin_name\" | .repository = \"$repo_url\" | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
+    echo "$plugins_list {\"$plugin_name\": $plugin_data}" | jq -s ".[0] + .[1]" > /usr/local/vesta/conf/plugins.json
+}

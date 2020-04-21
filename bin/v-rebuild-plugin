@@ -4,12 +4,12 @@ plugin_name="$1"
 
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
 
-plugin_ln="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name")"
+plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name")"
 
 if [[ ! "$plugin_name" ]]; then
     echo "Invalid arguments"
     exit 1
-elif [[ ! "$plugin_ln" ]]; then
+elif [[ ! "$plugin_conf" ]]; then
     echo "Plugin does not exist"
     exit 1
 fi
@@ -17,11 +17,11 @@ fi
 mkdir -p /usr/local/vesta/web/plugins
 
 if [[ ! -d "$plugin_path" ]]; then
-    plugin_repo="$(echo "$plugin_ln" | awk '{print $2}')"
+    plugin_repo="$(echo "$plugin_conf" | awk '{print $2}')"
     echo "Plugin $plugin_name not found, reinstalling via $plugin_repo"
     /usr/local/vesta/bin/v-add-plugin "$plugin_repo" yes
 else
-    echo "Rebuilding $plugin_name"
+    echo "Rebuilding plugin $plugin_name"
 
     # Create symbolic links to executables
     if [[ -d "$plugin_path/bin" ]]; then
