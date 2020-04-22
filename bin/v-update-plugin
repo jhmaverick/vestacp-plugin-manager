@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+plugin_name="$1"
+plugin_repo="$2"
+
+plugin_path="/usr/local/vesta/plugins/$plugin_name"
+plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name" plain)"
+
+if [[ ! "$plugin_name" ]]; then
+    echo "Invalid arguments"
+    exit 1
+elif [[ ! "$plugin_conf" ]]; then
+    echo "Plugin does not exist"
+    exit 1
+fi
+
+if [[ ! "$plugin_repo" ]]; then
+    # Reinstall from the same source as the current plugin
+    plugin_repo="$(echo "$plugin_conf" | awk '{print $3}')"
+fi
+
+# Disable plugin
+/usr/local/vesta/bin/v-disable-plugin "$plugin_name"
+
+# Remove current files
+if [[ -L "$plugin_path" ]]; then
+    unlink "$plugin_path"
+else
+    rm -rf "$plugin_path"
+fi
+
+# Re-add plugins
+/usr/local/vesta/bin/v-add-plugin "$plugin_repo"

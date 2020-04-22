@@ -46,7 +46,7 @@ function action_install($plugin_url, $reinstall = false) {
     $reinstall = ($reinstall == true) ? "yes" : "";
 
     echo "<pre>";
-    system(VESTA_CMD . "v-add-plugin \"$plugin_url\" $reinstall");
+    system(VESTA_CMD . "v-add-plugin \"$plugin_url\"");
     echo "</pre>";
 
     global $backbutton;

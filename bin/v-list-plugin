@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
+source /usr/local/vesta/func/helpers.sh
+
 plugin_name="$1"
-type="$2"
+format="${2:-shell}"
 
 plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
 plugin="$(echo "${plugins_list}" | jq -r ".\"$plugin_name\"")"
 
 if [[ "$plugin" && "$plugin" != "null" ]]; then
-    if [[ "$type" == "json" ]]; then
-        echo "$plugin"
-    else
-        plugin_repo="$(echo "$plugin" | jq -r '.repository')"
-        plugin_date="$(echo "$plugin" | jq -r '.date')"
-
-        echo -e "$plugin_name\t$plugin_repo\t$plugin_date"
-    fi
+    case "$format" in
+        json)   echo "$plugin" ;;
+        plain)  json_to 'plain' "[$plugin]" "name|version|repository|user-role|disabled|date" ;;
+        shell)  json_to 'shell' "[$plugin]" "name|version|repository|user-role|disabled|date" ;;
+        csv)    json_to 'csv' "[$plugin]" "name|version|repository|user-role|disabled|date|description" ;;
+    esac
 fi

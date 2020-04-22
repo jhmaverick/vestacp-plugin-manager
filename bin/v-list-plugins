@@ -1,18 +1,12 @@
 #!/usr/bin/env bash
 
-type="${1:-text}"
+source /usr/local/vesta/func/helpers.sh
 
-plugins_path="/usr/local/vesta/plugins"
+format="${1:-shell}"
 
-if [[ "$type" == "json" ]]; then
-    cat /usr/local/vesta/conf/plugins.json
-    exit
-fi
-
-plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"
-for plugin in $(echo "${plugins_list}" | jq -r '.[] | @base64'); do
-    plugin="$(echo "$plugin" | base64 --decode)"
-    plugin_name="$(echo "$plugin" | jq -r '.name')"
-
-    /usr/local/vesta/bin/v-list-plugin "$plugin_name" "$type"
-done
+case "$format" in
+    json)   cat /usr/local/vesta/conf/plugins.json ;;
+    plain)  json_to 'plain' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date" ;;
+    shell)  json_to 'shell' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date" ;;
+    csv)    json_to 'csv' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date|description" ;;
+esac

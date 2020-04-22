@@ -4,7 +4,7 @@ plugin_name="$1"
 
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
 
-plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name")"
+plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name" plain)"
 
 if [[ ! "$plugin_name" ]]; then
     echo "Invalid arguments"
@@ -12,14 +12,17 @@ if [[ ! "$plugin_name" ]]; then
 elif [[ ! "$plugin_conf" ]]; then
     echo "Plugin does not exist"
     exit 1
+elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" == "disabled" ]]; then
+    echo "Plugin $plugin_name is disabled."
+    exit 1
 fi
 
 mkdir -p /usr/local/vesta/web/plugins
 
 if [[ ! -d "$plugin_path" ]]; then
-    plugin_repo="$(echo "$plugin_conf" | awk '{print $2}')"
+    plugin_repo="$(echo "$plugin_conf" | awk '{print $3}')"
     echo "Plugin $plugin_name not found, reinstalling via $plugin_repo"
-    /usr/local/vesta/bin/v-add-plugin "$plugin_repo" yes
+    /usr/local/vesta/bin/v-add-plugin "$plugin_repo"
 else
     echo "Rebuilding plugin $plugin_name"
 

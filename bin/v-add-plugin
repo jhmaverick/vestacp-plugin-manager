@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-source /usr/local/vesta/func/plugins.sh
+source /usr/local/vesta/func/helpers.sh
 
 repo_url="$1"
-reinstall="${2:-no}"
 
 plugin_name="$(basename -- "$repo_url")"
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
@@ -30,12 +29,8 @@ mkdir -p /usr/local/vesta/plugins
 mkdir -p /usr/local/vesta/web/plugins
 
 if [[ -d "$plugin_path" ]]; then
-    if [[ "${reinstall,,}" == "yes" || "${reinstall,,}" == "y" ]]; then
-        /usr/local/vesta/bin/v-delete-plugin "$plugin_name"
-    else
-        echo "There is already a plugin with that name"
-        exit 1
-    fi
+    echo "There is already a plugin with that name"
+    exit 1
 fi
 
 if [[ "$repo_type" == "path" ]]; then
@@ -58,7 +53,21 @@ fi
 
 # Check installation
 if [[ "$(ls -A "/usr/local/vesta/plugins/$plugin_name")" ]]; then
-    update_plugin_conf "$plugin_name" "$repo_url"
+    # Get plugin data and add installation info
+    plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/plugin.json")"
+    plugin_data="$(echo "$plugin_data" | jq -r ".name = \"$plugin_name\" | .repository = \"$repo_url\" | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
+
+    # Check if plugin exist in vesta list to keep additional configurations
+    current_plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
+    if [[ "$current_plugin_data" && "$current_plugin_data" != "null" ]]; then
+        # Remove "disabled" index
+        #current_plugin_data="$(delete_json_index "disabled" "$current_plugin_data")"
+        # Merge data
+        plugin_data="$(echo "$current_plugin_data $plugin_data" | jq -s ".[0] + .[1]")"
+    fi
+
+    # Update vesta plugins list
+    update_json_index "$plugin_name" "$plugin_data" /usr/local/vesta/conf/plugins.json
 
     # Execute configuration for plugin in the vesta environment
     /usr/local/vesta/bin/v-rebuild-plugin "$plugin_name"

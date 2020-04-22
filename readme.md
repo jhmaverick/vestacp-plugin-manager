@@ -5,6 +5,12 @@ The plugins will be installed by Github repository.
 
 ## Installation
 
+#### Dependencies
+
+* jq library
+  * Debian: `sudo apt-get -y install jq`
+  * CentOS: `sudo yum -y install jq`
+
 ```bash
 curl -sL https://raw.githubusercontent.com/jhmaverick/vestacp-plugins/master/install.sh | bash -
 ```
