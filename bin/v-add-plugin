@@ -61,7 +61,7 @@ if [[ "$(ls -A "/usr/local/vesta/plugins/$plugin_name")" ]]; then
     current_plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
     if [[ "$current_plugin_data" && "$current_plugin_data" != "null" ]]; then
         # Remove "disabled" index
-        #current_plugin_data="$(delete_json_index "disabled" "$current_plugin_data")"
+        current_plugin_data="$(delete_json_index "disabled" "$current_plugin_data")"
         # Merge data
         plugin_data="$(echo "$current_plugin_data $plugin_data" | jq -s ".[0] + .[1]")"
     fi

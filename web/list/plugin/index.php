@@ -5,6 +5,7 @@ $TAB = "Plugins";
 
 // Include vesta functions
 include($_SERVER['DOCUMENT_ROOT'] . "/inc/main.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/inc/plugins-helper.php");
 // Header
 include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
 // Panel
@@ -27,11 +28,10 @@ echo '<div class="l-center units vesta-plugins">';
 echo '<link rel="stylesheet" href="/css/plugin.css"/>';
 
 
-$output_plugins = [];
-exec(VESTA_CMD . "v-list-plugins json", $output_plugins);
-$plugins = json_decode(implode('', $output_plugins), true);
+echo '<form action="/list/plugin/bulk.php" method="post" id="objects">';
 
 $i = 0;
+$plugins = get_plugins();
 foreach ($plugins as $plugin) {
     $plugin_name = $plugin['name'];
     $plugin_role = (isset($plugin['user-role']) && in_array($plugin['user-role'], ['all', 'admin'])) ? $plugin['user-role'] : "all";
@@ -43,6 +43,18 @@ foreach ($plugins as $plugin) {
     $plugin_author_name = (isset($plugin['author']['name']) && is_string($plugin['author']['name'])) ? $plugin['author']['name'] : "";
     $plugin_author_email = (isset($plugin['author']['email']) && is_string($plugin['author']['email'])) ? $plugin['author']['email'] : "";
     $plugin_author_homepage = (isset($plugin['author']['homepage']) && is_string($plugin['author']['homepage'])) ? $plugin['author']['homepage'] : "";
+
+    if (isset($plugin['disabled']) && $plugin['disabled'] == true) {
+        $status = "disabled";
+        $status_action = "enable";
+        $status_tags = 'unsuspend' ;
+        $status_confirmation = "Are you sure you want to enable %s?";
+    } else {
+        $status = "enabled";
+        $status_action = "disable";
+        $status_tags = 'suspend';
+        $status_confirmation = "Are you sure you want to disable %s?";
+    }
 
     // Check user role
     if ($plugin_role == 'admin' && $user != 'admin') {
@@ -59,7 +71,7 @@ foreach ($plugins as $plugin) {
     }
     ?>
 
-    <div class="l-unit" v_unit_id="<?= $plugin ?>" v_section="plugin">
+    <div class="l-unit <?php if($status == 'disabled') echo 'l-unit--suspended'; ?>" v_unit_id="<?= $plugin ?>" v_section="plugin">
         <div class="l-unit-toolbar clearfix">
             <!-- l-unit-toolbar__col -->
             <div class="l-unit-toolbar__col l-unit-toolbar__col--right noselect">
@@ -73,16 +85,27 @@ foreach ($plugins as $plugin) {
                     if ($user == "admin") {
                         if (!empty($plugin_repository)) {
                             ?>
-                            <div class="actions-panel__col actions-panel__edit" key-action="href"><a
-                                        href="/add/plugin/?action=reinstall&plugin-url=<?= urlencode($plugin_repository) ?>"><?= __('Reinstall') ?>
+                            <div class="actions-panel__col actions-panel__restart" key-action="href"><a
+                                        href="/add/plugin/?action=update&plugin=<?= urlencode($plugin_name) ?>"><?= __('Update') ?>
                                     <i></i></a></div>
                         <?php } ?>
+
+                        <div class="actions-panel__col actions-panel__suspend shortcut-s" key-action="js">
+                            <a id="<?=$status_tags ?>_link_<?=$i?>" class="data-controls do_<?=$status_tags?>">
+                                <?=__($status_action)?> <i class="do_<?=$status_tags?>"></i>
+                                <input type="hidden" name="<?=$status_tags?>_url" value="/list/plugin/bulk.php?action=<?=$status_action?>&plugin=<?=urlencode($plugin_name)?>&token=<?=$_SESSION['token']?>" />
+                                <div id="<?=$status_tags?>_dialog_<?=$i?>" class="confirmation-text-suspention hidden" title="<?=__('Confirmation')?>">
+                                    <p class="confirmation"><?=__($status_confirmation,$plugin_name)?></p>
+                                </div>
+                            </a>
+                            <span class="shortcut">&nbsp;S</span>
+                        </div>
 
                         <div class="actions-panel__col actions-panel__delete shortcut-delete" key-action="js">
                             <a id="delete_link_<?= $i ?>" class="data-controls do_delete">
                                 <?= __('delete') ?> <i class="do_delete"></i>
                                 <input type="hidden" name="delete_url"
-                                       value="/delete/plugin/?plugin=<?= $plugin_name ?>&token=<?= $_SESSION['token'] ?>"/>
+                                       value="/list/plugin/bulk.php?action=delete&plugin=<?= urlencode($plugin_name) ?>&token=<?= $_SESSION['token'] ?>"/>
                                 <div id="delete_dialog_<?= $i ?>" class="confirmation-text-delete hidden"
                                      title="<?= __('Confirmation') ?>">
                                     <p class="confirmation"><?= __('Are you sure you want to delete plugin %s?', $plugin_name) ?></p>
@@ -112,6 +135,17 @@ foreach ($plugins as $plugin) {
 
             <div class="l-unit__stats">
                 <table>
+                    <tr>
+                        <td>
+                            <div class="l-unit__stat-cols clearfix last">
+                                <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Status') ?>:</div>
+                                <div class="l-unit__stat-col l-unit__stat-col--right">
+                                    <b><?= $status ?></b>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
                     <tr>
                         <td>
                             <div class="l-unit__stat-cols clearfix last">
@@ -182,6 +216,8 @@ foreach ($plugins as $plugin) {
     <?php
     $i++;
 }
+
+echo "</form>";
 
 if (isset($backbutton) && $backbutton !== false) {
     echo "<div style=\"margin: 60px 0 30px;\">" .

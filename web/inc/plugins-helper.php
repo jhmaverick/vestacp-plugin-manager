@@ -36,10 +36,22 @@ function render_template($template, $vars = [], $args = []) {
 }
 
 /**
+ * Get all plugins installed
+ */
+function get_plugins() {
+    exec(VESTA_CMD . "v-list-plugins json", $output);
+    return json_decode(implode('', $output), true);
+
+}
+
+/**
+ *  Get plugin data
  *
  * @param string $plugin Plugin name.
  */
 function get_plugin_data($plugin) {
-    // TODO
+    exec(VESTA_CMD . "v-list-plugin \"$plugin\" json", $output);
+    return json_decode(implode('', $output), true);
+
 }
 

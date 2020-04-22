@@ -30,11 +30,6 @@ function default_template() {
         <input type="text" class="vst-input" name="plugin-url" required/>
         <br><br>
 
-        <label for="reinstall">
-            <input type="checkbox" name="reinstall" id="reinstall" class="show-checkbox"/> <?= __("Reinstall if exist") ?>
-        </label>
-        <br><br>
-
         <input type="hidden" name="action" value="install"/>
         <button class="button confirm" type="submit"><?= __("Install") ?></button>
         <button class="button cancel" type="button" onclick="location.href='/list/plugin/'"><?= __('Back') ?></button>
@@ -42,29 +37,36 @@ function default_template() {
     <?php
 }
 
-function action_install($plugin_url, $reinstall = false) {
-    $reinstall = ($reinstall == true) ? "yes" : "";
-
+function action_install($plugin_url) {
     echo "<pre>";
     system(VESTA_CMD . "v-add-plugin \"$plugin_url\"");
     echo "</pre>";
 
     global $backbutton;
+    $backbutton = "/add/plugin/";
+}
+
+function action_update($plugin_name) {
+    echo "<pre>";
+    system(VESTA_CMD . "v-update-plugin \"$plugin_name\"");
+    echo "</pre>";
+
+    echo '<script>window.history.pushState("","","/add/plugin/");</script>';
+
+    global $backbutton;
     $backbutton = "/list/plugin/";
 }
 
-if (isset($_GET['action']) && $_GET['action'] == "reinstall"
-    && isset($_GET['plugin-url']) && !empty($_GET['plugin-url'])
+if (isset($_GET['action']) && $_GET['action'] == "update"
+    && isset($_GET['plugin']) && !empty($_GET['plugin'])
 ) {
-    $plugin_url = trim($_GET['plugin-url']);
-    action_install($plugin_url, true);
+    $plugin_name = trim($_GET['plugin']);
+    action_update($plugin_name);
 } else if (isset($_POST['action']) && $_POST['action'] == "install"
     && isset($_POST['plugin-url']) && !empty($_POST['plugin-url'])
 ) {
     $plugin_url = trim($_POST['plugin-url']);
-    $reinstall = (isset($_POST['reinstall']));
-
-    action_install($plugin_url, $reinstall);
+    action_install($plugin_url);
 } else {
     default_template();
 }
