@@ -19,7 +19,6 @@ top_panel($user, $TAB);
 
 // Start content block
 echo '<div class="l-center units vesta-plugins-add">';
-echo '<link rel="stylesheet" href="/css/plugin.css"/>';
 
 function default_template() {
     ?>
@@ -32,7 +31,7 @@ function default_template() {
 
         <input type="hidden" name="action" value="install"/>
         <button class="button confirm" type="submit"><?= __("Install") ?></button>
-        <button class="button cancel" type="button" onclick="location.href='/list/plugin/'"><?= __('Back') ?></button>
+        <button class="button cancel" type="button" onclick="location.href='/plugin-manager/list/'"><?= __('Back') ?></button>
     </form>
     <?php
 }
@@ -43,7 +42,7 @@ function action_install($plugin_url) {
     echo "</pre>";
 
     global $backbutton;
-    $backbutton = "/add/plugin/";
+    $backbutton = "/plugin-manager/add/";
 }
 
 function action_update($plugin_name) {
@@ -51,10 +50,10 @@ function action_update($plugin_name) {
     system(VESTA_CMD . "v-update-plugin \"$plugin_name\"");
     echo "</pre>";
 
-    echo '<script>window.history.pushState("","","/add/plugin/");</script>';
+    echo '<script>window.history.pushState("","","/plugin-manager/add/");</script>';
 
     global $backbutton;
-    $backbutton = "/list/plugin/";
+    $backbutton = "/plugin-manager/list/";
 }
 
 if (isset($_GET['action']) && $_GET['action'] == "update"

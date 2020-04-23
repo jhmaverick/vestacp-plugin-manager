@@ -54,7 +54,7 @@ fi
 # Check installation
 if [[ "$(ls -A "/usr/local/vesta/plugins/$plugin_name")" ]]; then
     # Get plugin data and add installation info
-    plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/plugin.json")"
+    plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
     plugin_data="$(echo "$plugin_data" | jq -r ".name = \"$plugin_name\" | .repository = \"$repo_url\" | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
 
     # Check if plugin exist in vesta list to keep additional configurations

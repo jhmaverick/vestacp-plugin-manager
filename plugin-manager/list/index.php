@@ -5,7 +5,6 @@ $TAB = "Plugins";
 
 // Include vesta functions
 include($_SERVER['DOCUMENT_ROOT'] . "/inc/main.php");
-include($_SERVER['DOCUMENT_ROOT'] . "/inc/plugins-helper.php");
 // Header
 include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
 // Panel
@@ -14,7 +13,7 @@ top_panel($user, $TAB);
 echo '<div class="l-center">
 <div class="l-sort clearfix noselect">';
 if ($user == 'admin') {
-    echo '<a class="l-sort__create-btn" href="/add/plugin/" title="' . __('Install plugin') . '"></a>';
+    echo '<a class="l-sort__create-btn" href="/plugin-manager/add/" title="' . __('Install plugin') . '"></a>';
 }
 echo '
 <div class="l-sort-toolbar clearfix" style="min-height: 30px;"></div>
@@ -25,10 +24,9 @@ echo '
 
 // Start content block
 echo '<div class="l-center units vesta-plugins">';
-echo '<link rel="stylesheet" href="/css/plugin.css"/>';
 
 
-echo '<form action="/list/plugin/bulk.php" method="post" id="objects">';
+echo '<form action="/plugin-manager/actions/" method="post" id="objects">';
 
 $i = 0;
 $plugins = get_plugins();
@@ -86,14 +84,14 @@ foreach ($plugins as $plugin) {
                         if (!empty($plugin_repository)) {
                             ?>
                             <div class="actions-panel__col actions-panel__restart" key-action="href"><a
-                                        href="/add/plugin/?action=update&plugin=<?= urlencode($plugin_name) ?>"><?= __('Update') ?>
+                                        href="/plugin-manager/add/?action=update&plugin=<?= urlencode($plugin_name) ?>"><?= __('Update') ?>
                                     <i></i></a></div>
                         <?php } ?>
 
                         <div class="actions-panel__col actions-panel__suspend shortcut-s" key-action="js">
                             <a id="<?=$status_tags ?>_link_<?=$i?>" class="data-controls do_<?=$status_tags?>">
                                 <?=__($status_action)?> <i class="do_<?=$status_tags?>"></i>
-                                <input type="hidden" name="<?=$status_tags?>_url" value="/list/plugin/bulk.php?action=<?=$status_action?>&plugin=<?=urlencode($plugin_name)?>&token=<?=$_SESSION['token']?>" />
+                                <input type="hidden" name="<?=$status_tags?>_url" value="/plugin-manager/actions/?action=<?=$status_action?>&plugin=<?=urlencode($plugin_name)?>&token=<?=$_SESSION['token']?>" />
                                 <div id="<?=$status_tags?>_dialog_<?=$i?>" class="confirmation-text-suspention hidden" title="<?=__('Confirmation')?>">
                                     <p class="confirmation"><?=__($status_confirmation,$plugin_name)?></p>
                                 </div>
@@ -105,7 +103,7 @@ foreach ($plugins as $plugin) {
                             <a id="delete_link_<?= $i ?>" class="data-controls do_delete">
                                 <?= __('delete') ?> <i class="do_delete"></i>
                                 <input type="hidden" name="delete_url"
-                                       value="/list/plugin/bulk.php?action=delete&plugin=<?= urlencode($plugin_name) ?>&token=<?= $_SESSION['token'] ?>"/>
+                                       value="/plugin-manager/actions/?action=delete&plugin=<?= urlencode($plugin_name) ?>&token=<?= $_SESSION['token'] ?>"/>
                                 <div id="delete_dialog_<?= $i ?>" class="confirmation-text-delete hidden"
                                      title="<?= __('Confirmation') ?>">
                                     <p class="confirmation"><?= __('Are you sure you want to delete plugin %s?', $plugin_name) ?></p>

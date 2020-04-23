@@ -27,16 +27,17 @@ Structure:
 * **/web/** - A symbolic link will be created to this directory with the plugin name inside "vesta/web/plugins/".
 * **/install.sh** - If it exists it will be executed after the standard installation.
 * **/uninstall.sh** - If it exists it will be executed before the standard removal.
-* **/plugin.json** - Information about the plugin.
+* **/vestacp.json** - Information about the plugin.
 
 
-## plugin.json
+## vestacp.json
 
 ```json5
 {
   "name": "plugin-name",
   "description": "Plugin description",
   "version": "0.0.1",
+  "vestacp-version": "0.9.8",
   "user-role": "all|admin",
   "homepage": "https://github.com/jhmaverick/plugin-name#readme",
   "author": {
@@ -50,4 +51,5 @@ Structure:
 * **name:** The "name" parameter can be defined in JSON to be used in the application, but in Vesta the argument will be overridden by the name of the repository.\
 If it is necessary to define the argument, it is recommended to use the same name as the repository.
 * **user-role:** When defined as "admin" the plugin will be shown only for admin.
+* **vestacp-version:** Vesta
 

@@ -25,7 +25,7 @@ if (!empty($action) && !empty($plugin)) {
             break;
         case 'enable': $cmd='v-enable-plugin';
             break;
-        default: header("Location: /list/plugin/"); exit;
+        default: header("Location: /plugin-manager/list/"); exit;
     }
 
     $plugin = (!is_array($plugin)) ? [$plugin] : $plugin;
@@ -38,6 +38,6 @@ if (!empty($action) && !empty($plugin)) {
     }
 }
 
-header("Location: /list/plugin/");
+header("Location: /plugin-manager/list/");
 exit;
 
