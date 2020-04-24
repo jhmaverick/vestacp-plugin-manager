@@ -6,7 +6,7 @@ format="${1:-shell}"
 
 case "$format" in
     json)   cat /usr/local/vesta/conf/plugins.json ;;
-    plain)  json_to 'plain' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date" ;;
-    shell)  json_to 'shell' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date" ;;
-    csv)    json_to 'csv' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|disabled|date|description" ;;
+    plain)  json_to 'plain' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|enabled|date" ;;
+    shell)  json_to 'shell' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|enabled|date" ;;
+    csv)    json_to 'csv' /usr/local/vesta/conf/plugins.json "name|version|repository|user-role|enabled|date|description" ;;
 esac

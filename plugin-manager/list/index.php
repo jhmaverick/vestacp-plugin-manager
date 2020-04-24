@@ -29,7 +29,7 @@ echo '<div class="l-center units vesta-plugins">';
 echo '<form action="/plugin-manager/actions/" method="post" id="objects">';
 
 $i = 0;
-$plugins = get_plugins();
+$plugins = VestaPlugin::get_plugins();
 foreach ($plugins as $plugin) {
     $plugin_name = $plugin['name'];
     $plugin_role = (isset($plugin['user-role']) && in_array($plugin['user-role'], ['all', 'admin'])) ? $plugin['user-role'] : "all";
@@ -42,16 +42,16 @@ foreach ($plugins as $plugin) {
     $plugin_author_email = (isset($plugin['author']['email']) && is_string($plugin['author']['email'])) ? $plugin['author']['email'] : "";
     $plugin_author_homepage = (isset($plugin['author']['homepage']) && is_string($plugin['author']['homepage'])) ? $plugin['author']['homepage'] : "";
 
-    if (isset($plugin['disabled']) && $plugin['disabled'] == true) {
-        $status = "disabled";
-        $status_action = "enable";
-        $status_tags = 'unsuspend' ;
-        $status_confirmation = "Are you sure you want to enable %s?";
-    } else {
+    if (isset($plugin['enabled']) && $plugin['enabled'] == true) {
         $status = "enabled";
         $status_action = "disable";
         $status_tags = 'suspend';
         $status_confirmation = "Are you sure you want to disable %s?";
+    } else {
+        $status = "disabled";
+        $status_action = "enable";
+        $status_tags = 'unsuspend' ;
+        $status_confirmation = "Are you sure you want to enable %s?";
     }
 
     // Check user role
@@ -60,7 +60,7 @@ foreach ($plugins as $plugin) {
     }
 
     // Check if plugins has a page
-    if (file_exists("/usr/local/vesta/web/plugins/$plugin_name/index.php")) {
+    if (file_exists("/usr/local/vesta/web/plugin/$plugin_name/index.php")) {
         $plugin_web = "/plugins/$plugin_name/";
         $display = "<a href=\"$plugin_web\">$plugin_name</a>";
     } else {

@@ -1,69 +1,56 @@
 <?php
 
-class VestaPlugin {
-
-}
-
-/**
- * @param string $template Full path to the template file.
- * @param array $vars Variables to extract.
- * @param array $args <p>Extra arguments.
- *  * tab - Tab name to top_panel function.
- * </p>
- */
-function render_template($template, $vars = [], $args = []) {
-    global $user, $TAB;
-
-    $tab_name = (isset($args['tab'])) ? $args['tab'] : $TAB;
-
-    // Header
-    include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
-
-    // Panel
-    top_panel(empty($_SESSION['look']) ? $_SESSION['user'] : $_SESSION['look'], $tab_name);
-
-    // Extract variables
-    if (is_array($vars)) {
-        extract($vars, EXTR_SKIP);
-    }
-
-    // Body
-    if (preg_match("/\.(html|php)$/", $template) && file_exists($template)) {
-        @include($template);
-    }
-
-    // Including common js files
-    @include_once($_SERVER['DOCUMENT_ROOT'] . '/templates/scripts.html');
-
-    // Footer
-    include($_SERVER['DOCUMENT_ROOT'] . '/templates/footer.html');
-}
-
-/**
- * Get all plugins installed
- */
-function get_plugins() {
-    exec(VESTA_CMD . "v-list-plugins json", $output);
-    return json_decode(implode('', $output), true);
-
-}
-
-/**
- *  Get plugin data
- *
- * @param string $plugin Plugin name.
- */
-function get_plugin_data($plugin) {
-    exec(VESTA_CMD . "v-list-plugin \"$plugin\" json", $output);
-    return json_decode(implode('', $output), true);
-
-}
-
 class Vesta {
 
     private static $filters = [];
     private static $actions = [];
 
+    /**
+     * Render template
+     *
+     * @param string $template HTML or full path to the template file.
+     * @param array $vars Variables to extract.
+     * @param array $args <p>Extra arguments.
+     *  * tab - Tab name to top_panel function.
+     * </p>
+     */
+    public static function render($template, $vars = [], $args = []) {
+        global $user, $TAB;
+
+        $tab_name = (isset($args['tab'])) ? $args['tab'] : $TAB;
+
+        // Header
+        include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
+
+        // Panel
+        top_panel(empty($_SESSION['look']) ? $_SESSION['user'] : $_SESSION['look'], $tab_name);
+
+        // Extract variables
+        if (is_array($vars)) {
+            extract($vars, EXTR_SKIP);
+        }
+
+        // Body
+        if (preg_match("/\.(html|php)$/", $template) && file_exists($template)) {
+            @include($template);
+        } else {
+            echo $template;
+        }
+
+        // Including common js files
+        @include_once($_SERVER['DOCUMENT_ROOT'] . '/templates/scripts.html');
+
+        // Footer
+        include($_SERVER['DOCUMENT_ROOT'] . '/templates/footer.html');
+    }
+
+    /**
+     * Hook to modify a filter
+     *
+     * @param string $tag
+     * @param callable $callback
+     * @param int $priority
+     */
     public static function add_filter($tag, $callback, $priority = null) {
         if (!is_string($tag)) return;
         $priority = (is_int($priority) && $priority > 0) ? $priority : 10;
@@ -76,21 +63,35 @@ class Vesta {
         }
     }
 
-    public static function apply_filters($tag, $init_value) {
+    /**
+     * Filter a value
+     *
+     * @param string $tag Name of the filter
+     * @param mixed ...$init_value Value to filter and optional args
+     * @return mixed
+     */
+    public static function apply_filters($tag, ...$init_value) {
         if (isset(self::$filters[$tag])) {
             $tag_filters = self::$filters[$tag];
             ksort($tag_filters);
 
             foreach ($tag_filters as $priority => $list) {
                 foreach ($list as $i => $callback) {
-                    $init_value = call_user_func($callback, $init_value);
+                    $init_value[0] = call_user_func_array($callback, $init_value);
                 }
             }
         }
 
-        return $init_value;
+        return $init_value[0];
     }
 
+    /**
+     * Add action to be called in specific point during execution
+     *
+     * @param string $tag
+     * @param callable $callback
+     * @param int $priority
+     */
     public static function add_action($tag, $callback, $priority = null) {
         if (!is_string($tag)) return;
         $priority = (is_int($priority) && $priority > 0) ? $priority : 10;
@@ -103,6 +104,12 @@ class Vesta {
         }
     }
 
+    /**
+     * Execute an action
+     *
+     * @param string $tag
+     * @param mixed ...$args
+     */
     public static function do_action($tag, ...$args) {
         $args = is_array($args) ? $args : [];
 
@@ -118,6 +125,12 @@ class Vesta {
         }
     }
 
+    /**
+     * Add CSS on head
+     *
+     * @param string $link
+     * @param int $priority
+     */
     public static function add_css($link, $priority = 10) {
         if (!is_string($link)) return;
 
@@ -127,6 +140,12 @@ class Vesta {
         }, $priority);
     }
 
+    /**
+     * Add JS on head
+     *
+     * @param string $link
+     * @param int $priority
+     */
     public static function add_js($link, $priority = 10) {
         if (!is_string($link)) return;
 
@@ -136,6 +155,15 @@ class Vesta {
         }, $priority);
     }
 
+    /**
+     * Add item on header menu
+     *
+     * @param string $name Name to display.
+     * @param string $link
+     * @param string $page_tab Used to marquee menu as active if the link is from a vesta page. Name will be used if not defined.
+     * @param string $local The place where the menu will be displayed.
+     * @param int $priority
+     */
     public static function add_header_menu($name, $link = null, $page_tab = null, $local = 'all_users', $priority = 10) {
         if (!is_string($name) || empty($name)) return;
 
@@ -152,13 +180,31 @@ class Vesta {
         }, $priority);
     }
 
-    public static function add_menu($name, $link = null, $page_tab = null, $sub_items = [], $local = 'all_users', $priority = 10) {
+    /**
+     * Add item on left menu(l-stat)
+     *
+     * Not displayed in default vesta theme.
+     *
+     * @param string $name Name to display.
+     * @param string $link
+     * @param string $page_tab Name will be used if not defined.
+     * @param array $sub_items <p>
+     *  Can be used to add a submenu or display an information.
+     *  * name  - Name to display
+     *  * value - (optional)
+     *  * link  - (optional)
+     * </p>
+     * @param string $local The place where the menu will be displayed.
+     * @param int $priority
+     */
+    public static function add_menu($name, $link, $page_tab = null, $sub_items = [], $local = 'all_users', $priority = 10) {
         if (!is_string($name) || empty($name)) return;
+        if (!is_string($link) || empty($link)) return;
 
         $item = [];
 
         $item['name'] = $name;
-        if (is_string($link) && !empty($link)) $item['link'] = $link;
+        $item['link'] = $link;
         if (is_string($page_tab) && !empty($page_tab)) $item['page_tab'] = $page_tab;
         if (is_string($local) && !empty($local)) $item['local'] = $local;
         if (is_array($sub_items) && !empty($sub_items)) $item['sub_items'] = $sub_items;
@@ -169,6 +215,11 @@ class Vesta {
         }, $priority);
     }
 
+    /**
+     * Return the place where the script is running.
+     *
+     * @return string
+     */
     public static function current_panel() {
         if (isset($_SESSION['user']) && ($_SESSION['user'] != 'admin' || isset($_SESSION['look']) && !empty($_SESSION['look']))) {
             return 'user_panel';
@@ -179,6 +230,29 @@ class Vesta {
         }
     }
 
+}
+
+class VestaPlugin {
+
+    /**
+     * Get all plugins installed
+     */
+    public static function get_plugins() {
+        exec(VESTA_CMD . "v-list-plugins json", $output);
+        return json_decode(implode('', $output), true);
+
+    }
+
+    /**
+     *  Get plugin data
+     *
+     * @param string $plugin Plugin name.
+     */
+    public static function get_plugin($plugin) {
+        exec(VESTA_CMD . "v-list-plugin \"$plugin\" json", $output);
+        return json_decode(implode('', $output), true);
+
+    }
 }
 
 // Insert additional elements in the head
@@ -372,15 +446,15 @@ Vesta::add_action('panel_init', function () {
     }
 
     // Add plugins
-    $plugins_list = get_plugins();
+    $plugins_list = VestaPlugin::get_plugins();
     $total_enabled = 0;
     $total_disabled = 0;
 
     foreach ($plugins_list as $plugin) {
-        if (isset($plugin['disabled']) && $plugin['disabled'] == true) {
-            $total_disabled++;
-        } else {
+        if (isset($plugin['enabled']) && $plugin['enabled'] == true) {
             $total_enabled++;
+        } else {
+            $total_disabled++;
         }
     }
 
@@ -392,17 +466,13 @@ Vesta::add_action('panel_init', function () {
 }, 5);
 
 // Include each plugin functions in an isolated scope
-function load_plugin($plugin) {
-    $plugin_name = $plugin['name'];
-
-    if (file_exists("/usr/local/vesta/web/plugins/$plugin_name/functions.php")) {
-        extract($GLOBALS, EXTR_SKIP);
-        include_once "/usr/local/vesta/web/plugins/$plugin_name/functions.php";
+function load_plugin($plugin_name) {
+    if (file_exists("/usr/local/vesta/web/plugin/$plugin_name/functions.php")) {
+        include_once "/usr/local/vesta/web/plugin/$plugin_name/functions.php";
     }
 }
 
-// Load plugins functions
-foreach (get_plugins() as $plugin) {
-    load_plugin($plugin);
+foreach (VestaPlugin::get_plugins() as $plugin) {
+    load_plugin($plugin['name']);
 }
 

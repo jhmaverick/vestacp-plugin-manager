@@ -23,12 +23,17 @@ After installation a menu will be added to the vesta panel.
 Plugins will be installed in /usr/local/vesta/plugins
 
 Structure:
-* **/bin/** - All files in this directory will be linked to vesta bin.
-* **/web/** - A symbolic link will be created to this directory with the plugin name inside "vesta/web/plugins/".
-* **/install.sh** - If it exists it will be executed after the standard installation.
-* **/uninstall.sh** - If it exists it will be executed before the standard removal.
 * **/vestacp.json** - Information about the plugin.
+* **/bin/** - All files in this directory will be linked to vesta "/usr/local/vesta/bin".
+* **/web/** - A symbolic link will be created to this directory with the plugin name inside "/usr/local/vesta/web/plugin/".
+* **/hook/** - Hooks to the plugin life cycle.
 
+## Hooks
+
+* **/hook/post_install** - Executed after the plugin installation and before create the symlinks.
+* **/hook/post_enable** - Executed when plugin status change to enabled.
+* **/hook/pre_disable** - Executed when plugin status change to disabled.
+* **/hook/pre_uninstall** - Executed after delete the symlinks and before delete plugin files.
 
 ## vestacp.json
 
@@ -37,8 +42,9 @@ Structure:
   "name": "plugin-name",
   "description": "Plugin description",
   "version": "0.0.1",
-  "vestacp-version": "0.9.8",
+  "min-vesta": "0.9.8",
   "user-role": "all|admin",
+  "repository": "https://github.com/jhmaverick/plugin-name",
   "homepage": "https://github.com/jhmaverick/plugin-name#readme",
   "author": {
     "name": "João Henrique",
@@ -48,8 +54,8 @@ Structure:
 }
 ```
 
-* **name:** The "name" parameter can be defined in JSON to be used in the application, but in Vesta the argument will be overridden by the name of the repository.\
-If it is necessary to define the argument, it is recommended to use the same name as the repository.
+* **name:** The plugin name. Will be used in the plugin directory and the plugin identification. 
 * **user-role:** When defined as "admin" the plugin will be shown only for admin.
-* **vestacp-version:** Vesta
+* **repository:** The plugin repository. Used to download updates in `v-update-plugin`.
+* **min-vesta:** Minimum vesta version.
 

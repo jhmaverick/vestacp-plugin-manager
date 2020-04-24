@@ -28,16 +28,8 @@
 }
 
 /* Hidden l-stat custom items to prevent break default vesta layout */
-/*.l-stat__item {*/
-/*    display: none;*/
-/*}*/
-
-.l-stat .l-stat__col {
-    display: none;
-}
-
 .l-stat .l-stat__col.l-stat__col--show {
-    display: block;
+    display: none;
 }
 
 /***************************************

@@ -11,19 +11,23 @@ if [[ ! "$plugin_name" ]]; then
 elif [[ ! "$plugin_conf" ]]; then
     echo "Plugin does not exist"
     exit 1
-elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" == "true" ]]; then
+elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" != "true" ]]; then
     echo "Plugin $plugin_name is disabled"
     exit 1
 fi
 
-mkdir -p /usr/local/vesta/web/plugins
+mkdir -p /usr/local/vesta/web/plugin
 
 if [[ ! -d "$plugin_path" ]]; then
     plugin_repo="$(echo "$plugin_conf" | awk '{print $3}')"
-    echo "Plugin $plugin_name not found, reinstalling via $plugin_repo"
-    /usr/local/vesta/bin/v-add-plugin "$plugin_repo"
+    if [[ "$plugin_repo" && "$plugin_repo" != "null" ]]; then
+        echo "Plugin $plugin_name not found, reinstalling via $plugin_repo"
+        /usr/local/vesta/bin/v-add-plugin "$plugin_repo"
+    else
+        echo "Plugin $plugin_name not found and don't have a repository in their configs."
+    fi
 else
-    echo "Rebuilding plugin $plugin_name"
+    echo "Configuring plugin $plugin_name"
 
     # Create symbolic links to executables
     if [[ -d "$plugin_path/bin" ]]; then
@@ -37,10 +41,10 @@ else
 
     # Create symbolic link to the web directory
     if [[ -d "$plugin_path/web" ]]; then
-        if [[ -L "/usr/local/vesta/web/plugins/$plugin_name" ]]; then
-            unlink "/usr/local/vesta/web/plugins/$plugin_name"
+        if [[ -L "/usr/local/vesta/web/plugin/$plugin_name" ]]; then
+            unlink "/usr/local/vesta/web/plugin/$plugin_name"
         fi
 
-        ln -sf "$plugin_path/web" "/usr/local/vesta/web/plugins/$plugin_name"
+        ln -sf "$plugin_path/web" "/usr/local/vesta/web/plugin/$plugin_name"
     fi
 fi

@@ -13,20 +13,20 @@ if [[ ! "$plugin_name" ]]; then
 elif [[ ! -d "$plugin_path" ]]; then
     echo "Plugin \"$plugin_name\" is not installed"
     exit 1
-elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" != "true" ]]; then
+elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" == "true" ]]; then
     echo "Plugin \"$plugin_name\" already enabled"
     exit 1
 fi
 
-# Remove disabled index in plugin conf
+# Change plugin status
 plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
-plugin_data="$(delete_json_index "disabled" "$plugin_data")"
+plugin_data="$(update_json_index "enabled" "true" "$plugin_data")"
 update_json_index "$plugin_name" "$plugin_data" /usr/local/vesta/conf/plugins.json
 
 # Reconfigure plugin on vesta
 /usr/local/vesta/bin/v-rebuild-plugin "$plugin_name"
 
 # Check if plugin has additional configurations
-if [[ -f "$plugin_path/install.sh" ]]; then
-    bash "$plugin_path/install.sh"
+if [[ -f "$plugin_path/hook/post_enable" ]]; then
+    bash "$plugin_path/hook/post_enable"
 fi

@@ -17,6 +17,11 @@ fi
 # Disable plugin to remove from vesta
 /usr/local/vesta/bin/v-disable-plugin "$plugin_name"
 
+# Check pre_uninstall hook
+if [[ -f "/usr/local/vesta/plugins/$plugin_name/hook/pre_uninstall" ]]; then
+    bash "/usr/local/vesta/plugins/$plugin_name/hook/pre_uninstall"
+fi
+
 # Remove plugin files
 if [[ -L "$plugin_path" ]]; then
     unlink "$plugin_path"

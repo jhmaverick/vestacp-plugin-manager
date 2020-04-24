@@ -61,6 +61,24 @@ vcp_remove_top_menu_item() {
     fi
 }
 
+random_string() {
+    length=${1:-16}
+    special_characters="${2:-no}"
+
+    matrix='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    if [[ "${special_characters,,}" == "yes" ]]; then
+        matrix+="-._"
+    fi
+
+    result=""
+    while [ ${n:=1} -le $length ]; do
+        result="$result${matrix:$(($RANDOM%${#matrix})):1}"
+        let n+=1
+    done
+
+    echo "$result"
+}
+
 # Get and valid a JSON
 #
 # * Checks whether it is a valid JSON;

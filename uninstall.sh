@@ -27,7 +27,7 @@ if [[ -d /usr/local/vesta/plugins ]]; then
 fi
 
 # Remove changes in vesta files
-sed -Ei "/$(escape 'include_once($_SERVER["DOCUMENT_ROOT"] . "/plugin-manager/inc/main.php");')/d" /usr/local/vesta/web/inc/main.php
+sed -Ei "/$(escape '@include_once($_SERVER["DOCUMENT_ROOT"] . "/plugin-manager/inc/main.php");')/d" /usr/local/vesta/web/inc/main.php
 
 sed -Ei "/$(escape '<?php Vesta::do_action("init"); ?>')/d" /usr/local/vesta/web/templates/header.html
 sed -Ei "/$(escape '<?php Vesta::do_action("head"); ?>')/d" /usr/local/vesta/web/templates/header.html

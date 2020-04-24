@@ -11,7 +11,10 @@ elif [[ -d /usr/local/vesta/web/plugin-manager ]]; then
     exit 1
 fi
 
-if [[ ! "$(command -v jq)" ]]; then
+if [[ ! "$(command -v unzip)" ]]; then
+    echo "You must install the \"unzip\" library before proceeding." >&2
+    exit 1
+elif [[ ! "$(command -v jq)" ]]; then
     echo "You must install the \"jq\" library before proceeding." >&2
     echo "sudo apt-get -y install jq" >&2
     echo "sudo yum -y install jq" >&2
@@ -62,7 +65,7 @@ escape() {
     echo "$1" | sed "s|[\`~!@#$%^&*()_=+{}\|;:\"',<.>/?-]|\\\&|g"
 }
 
-file_append 'include_once($_SERVER["DOCUMENT_ROOT"] . "/plugin-manager/inc/main.php");' /usr/local/vesta/web/inc/main.php
+file_append '@include_once($_SERVER["DOCUMENT_ROOT"] . "/plugin-manager/inc/main.php");' /usr/local/vesta/web/inc/main.php
 
 file_prepend '<?php Vesta::do_action("init"); ?>' /usr/local/vesta/web/templates/header.html
 sed -Ei "s|(</head>)|$(escape '<?php Vesta::do_action("head"); ?>')\n\1|" /usr/local/vesta/web/templates/header.html
@@ -83,5 +86,10 @@ sed -Ei "s|(</head>)|$(escape '<?php Vesta::do_action("head"); ?>')\n\1|" /usr/l
 sed -Ei "s|(<body>)|\1\n$(escape '<?php Vesta::do_action("body"); ?>')|" /usr/local/vesta/web/templates/admin/list_server_info.html
 
 file_prepend '<?php Vesta::do_action("footer"); ?>' /usr/local/vesta/web/templates/footer.html
+
+if [[ "$VESTACP_PLUGIN_MANAGER_DEV_MODE" != "yes" ]]; then
+    # Install plugin modern theme
+    /usr/local/vesta/bin/v-add-plugin "https://github.com/jhmaverick/vestacp-renew-theme"
+fi
 
 echo -e "\nInstallation completed"

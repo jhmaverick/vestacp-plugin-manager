@@ -16,10 +16,15 @@ fi
 # Reinstall from the same source as the current plugin
 plugin_repo="$(echo "$plugin_conf" | awk '{print $3}')"
 
+if [[ ! "$plugin_repo" || "$plugin_repo" == "null" ]]; then
+    echo "Plugin $plugin_name don't have a repository defined to perform the update."
+    exit 1
+fi
+
 # Disable plugin
 /usr/local/vesta/bin/v-disable-plugin "$plugin_name"
 
-# Remove current files
+# Remove plugin files
 if [[ -L "$plugin_path" ]]; then
     unlink "$plugin_path"
 else
