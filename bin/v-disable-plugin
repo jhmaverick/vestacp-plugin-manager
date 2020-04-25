@@ -13,7 +13,7 @@ if [[ ! "$plugin_name" ]]; then
 elif [[ ! -d "$plugin_path" ]]; then
     echo "Plugin \"$plugin_name\" is not installed"
     exit 1
-elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" != "true" ]]; then
+elif [[ "$(echo "$plugin_conf" | awk '{print $4}')" != "true" ]]; then
     echo "Plugin \"$plugin_name\" already disabled"
     exit 1
 fi

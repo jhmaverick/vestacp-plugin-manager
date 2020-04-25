@@ -51,7 +51,7 @@ remove_from_vesta_web() {
     echo "Removing from /usr/local/vesta/web/templates/admin/list_server_info.html"
     sed -Ei "/$(escape '<?php Vesta::do_action("init"); ?>')/d" /usr/local/vesta/web/templates/admin/list_server_info.html
     sed -Ei "/$(escape '<?php Vesta::do_action("head"); ?>')/d" /usr/local/vesta/web/templates/admin/list_server_info.html
-    sed -Ei "s| class=\"$(escape '<?php Vesta::do_action("body_class"); ?>')\"||" /usr/local/vesta/web/templates/admin/list_server_info.html
+    sed -Ei "s| class=\"list_server_info $(escape '<?php Vesta::do_action("body_class"); ?>')\"||" /usr/local/vesta/web/templates/admin/list_server_info.html
 
     echo "Removing from /usr/local/vesta/web/templates/footer.html"
     sed -Ei "/$(escape '<?php Vesta::do_action("footer"); ?>')/d" /usr/local/vesta/web/templates/footer.html

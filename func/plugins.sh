@@ -8,7 +8,7 @@ get_plugin_name_from_source() {
     if [[ -f "$plugin_dir/vestacp.json" ]]; then
         plugin_name="$(get_json_index "name" "$plugin_dir/vestacp.json")"
 
-        if [[ "$plugin_name" && "$plugin_name" != "null" ]]; then
+        if [[ "$plugin_name" && "$plugin_name" != "null" && "$(echo "$plugin_name" | grep -E "^[a-z0-9_\-]+$")" ]]; then
             echo "$plugin_name"
         fi
     fi

@@ -12,6 +12,9 @@ Plugin manager features:
   * Adds the classes "Vesta" and "VestaPlugin" to assist plugins in their execution.
 * Plugins can have hooks to run during their life cycle.
 
+![screenshot.png](screenshot.png)
+
+
 ## Installation
 
 #### Dependencies
@@ -95,9 +98,25 @@ If the plugin does not have a web interface it will not need the "web" directory
 #### Vesta::render
 
 Args:
-* string $template
-* array $vars
-* array $args
+* string $template HTML or full path to the template file.
+* array $args 
+  * string .plugin       - Plugin name to use as template directory.
+  * string .tab          - Tab name to top_panel function. If not defined use global $TAB.
+  * string .template_dir - Full path to directory. Default: /usr/local/vesta/web.
+  * The rest of the arguments will be extracted
+
+#### Vesta::render_cmd_output
+
+Args:
+* string $output
+* string $title
+* string $backbutton
+
+#### Vesta::exec
+
+Args:
+* string $cmd
+* ... $args
 
 #### Vesta::add_filter
 
@@ -166,7 +185,7 @@ Return: user_panel|admin_panel|external
 
 #### Vesta::get_plugin
 Args:
-* string $plugin
+* string $plugin_name
 
 
 ## vestacp.json
@@ -177,7 +196,6 @@ Args:
   "description": "Plugin description",
   "version": "0.0.1",
   "min-vesta": "0.9.8",
-  "user-role": "all|admin",
   "repository": "https://github.com/jhmaverick/plugin-name",
   "homepage": "https://github.com/jhmaverick/plugin-name#readme",
   "author": {
@@ -188,8 +206,7 @@ Args:
 }
 ```
 
-* **name:** The plugin name. Will be used in the plugin directory and the plugin identification. 
-* **user-role:** When defined as "admin" the plugin will be shown only for admin.
+* **name:** The plugin name. Will be used in the plugin directory and the plugin identification. Only include lowercase alphanumeric, dashes, and underscores characters.
 * **repository:** The plugin repository. Used to download updates in `v-update-plugin`.
 * **min-vesta:** Minimum vesta version.
 

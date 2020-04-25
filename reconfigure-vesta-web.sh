@@ -41,7 +41,7 @@ file_prepend '<?php Vesta::do_action("init"); ?>' /usr/local/vesta/web/templates
 [[ ! "$(grep -F '<?php Vesta::do_action("head"); ?>' /usr/local/vesta/web/templates/header.html)" ]] \
     && sed -Ei "s|(</head>)|$(escape '<?php Vesta::do_action("head"); ?>')\n\1|" /usr/local/vesta/web/templates/header.html
 [[ ! "$(grep -F '<?php Vesta::do_action("body_class"); ?>' /usr/local/vesta/web/templates/header.html)" ]] \
-    && sed -Ee "s|(<body class=\".*)(\">)|\1 $(escape '<?php Vesta::do_action("body_class"); ?>')\2|" /usr/local/vesta/web/templates/header.html
+    && sed -Ei "s|(<body class=\".*)(\">)|\1 $(escape '<?php Vesta::do_action("body_class"); ?>')\2|" /usr/local/vesta/web/templates/header.html
 
 echo "Applying in /usr/local/vesta/web/templates/admin/panel.html"
 file_prepend '<?php Vesta::do_action("panel_init"); ?>' /usr/local/vesta/web/templates/admin/panel.html
@@ -68,7 +68,7 @@ file_prepend '<?php Vesta::do_action("init"); ?>' /usr/local/vesta/web/templates
 [[ ! "$(grep -F '<?php Vesta::do_action("head"); ?>' /usr/local/vesta/web/templates/admin/list_server_info.html)" ]] \
     && sed -Ei "s|(</head>)|$(escape '<?php Vesta::do_action("head"); ?>')\n\1|" /usr/local/vesta/web/templates/admin/list_server_info.html
 [[ ! "$(grep -F '<?php Vesta::do_action("body_class"); ?>' /usr/local/vesta/web/templates/admin/list_server_info.html)" ]] \
-    && sed -Ee "s|(<body>)|<body class=\"$(escape '<?php Vesta::do_action("body_class"); ?>')\">|" /usr/local/vesta/web/templates/admin/list_server_info.html
+    && sed -Ei "s|(<body>)|<body class=\"list_server_info $(escape '<?php Vesta::do_action("body_class"); ?>')\">|" /usr/local/vesta/web/templates/admin/list_server_info.html
 
 echo "Applying in /usr/local/vesta/web/templates/footer.html"
 file_prepend '<?php Vesta::do_action("footer"); ?>' /usr/local/vesta/web/templates/footer.html

@@ -4,7 +4,7 @@ error_reporting(NULL);
 ob_start();
 session_start();
 
-include($_SERVER['DOCUMENT_ROOT']."/inc/main.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/inc/main.php");
 
 // Check token
 if ($_SESSION['user'] != 'admin'
@@ -19,22 +19,27 @@ $plugin = $_GET['plugin'];
 
 if (!empty($action) && !empty($plugin)) {
     switch ($action) {
-        case 'delete': $cmd='v-delete-plugin';
+        case 'delete':
+            $cmd = 'v-delete-plugin';
             break;
-        case 'disable': $cmd='v-disable-plugin';
+
+        case 'disable':
+            $cmd = 'v-disable-plugin';
             break;
-        case 'enable': $cmd='v-enable-plugin';
+
+        case 'enable':
+            $cmd = 'v-enable-plugin';
             break;
-        default: header("Location: /plugin-manager/list/"); exit;
+
+        default:
+            header("Location: /plugin-manager/list/");
+            exit;
     }
 
     $plugin = (!is_array($plugin)) ? [$plugin] : $plugin;
 
     foreach ($plugin as $value) {
-        $value = escapeshellarg($value);
-        $dom = escapeshellarg($domain);
-        exec (VESTA_CMD.$cmd." ".$value, $output, $return_var);
-        $restart = 'yes';
+        $output = Vesta::exec($cmd, $value);
     }
 }
 

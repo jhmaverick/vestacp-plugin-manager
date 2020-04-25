@@ -1,8 +1,17 @@
+<?php if (!class_exists('Vesta')) exit; ?>
 <div class="l-center">
     <div class="l-sort clearfix noselect">
         <a class="l-sort__create-btn" href="/plugin-manager/add/" title="<?= __('Install plugin') ?>"></a>
 
-        <div class="l-sort-toolbar clearfix" style="min-height: 30px;"></div>
+        <div class="l-sort-toolbar clearfix" style="min-height: 30px;">
+            <table>
+                <tr>
+                    <td class="step-right">
+                        <a class="vst" href="/plugin-manager/update-sys-plugins/" target="_blank"><?=__('Update Plugin Manager')?> <i></i></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -12,10 +21,9 @@
     <form action="/plugin-manager/actions/" method="post" id="objects">
         <?php
         $i = 0;
-        $plugins = Vesta::get_plugins();
+        $plugins = Vesta::exec('v-list-plugins', 'json');
         foreach ($plugins as $plugin) {
             $plugin_name = $plugin['name'];
-            $plugin_role = (isset($plugin['user-role']) && in_array($plugin['user-role'], ['all', 'admin'])) ? $plugin['user-role'] : "all";
             $plugin_version = (isset($plugin['version']) && is_string($plugin['version'])) ? $plugin['version'] : "";
             $plugin_desc = (isset($plugin['description']) && is_string($plugin['description'])) ? $plugin['description'] : "";
             $plugin_license = (isset($plugin['license']) && is_string($plugin['license'])) ? $plugin['license'] : "";
@@ -37,18 +45,11 @@
                 $status_confirmation = "Are you sure you want to enable %s?";
             }
 
-            // Check user role
-            if ($plugin_role == 'admin' && $user != 'admin') {
-                continue;
-            }
-
             // Check if plugins has a page
             if (file_exists("/usr/local/vesta/web/plugin/$plugin_name/index.php")) {
-                $plugin_web = "/plugins/$plugin_name/";
-                $display = "<a href=\"$plugin_web\">$plugin_name</a>";
+                $plugin_web = "/plugin/$plugin_name/";
             } else {
                 $plugin_web = "";
-                $display = "$plugin_name";
             }
             ?>
 
@@ -112,7 +113,7 @@
 
                 <div class="l-unit__col l-unit__col--right">
                     <div class="l-unit__name">
-                        <?= $display ?>
+                        <?= $plugin_name ?>
                     </div>
 
                     <div class="l-unit__desc">
@@ -124,21 +125,18 @@
                             <tr>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Status') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Status') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <b><?= $status ?></b>
                                         </div>
                                     </div>
                                 </td>
-                            </tr>
-
-                            <tr>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Version') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Version') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <b><?= $plugin_version ?></b>
@@ -147,18 +145,8 @@
                                 </td>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Role') ?>
-                                            :
-                                        </div>
-                                        <div class="l-unit__stat-col l-unit__stat-col--right">
-                                            <b><?= __($plugin_role) ?></b>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Home Page') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Home Page') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <b><a href="<?= $plugin_homepage ?>"
@@ -171,8 +159,8 @@
                             <tr>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Author') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Author') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <?php if (!empty($plugin_author_homepage)) { ?>
@@ -186,8 +174,8 @@
                                 </td>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Email') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Email') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <b><?= $plugin_author_email ?></b>
@@ -196,8 +184,8 @@
                                 </td>
                                 <td>
                                     <div class="l-unit__stat-cols clearfix last">
-                                        <div class="l-unit__stat-col l-unit__stat-col--left compact"><?= __('Repository') ?>
-                                            :
+                                        <div class="l-unit__stat-col l-unit__stat-col--left compact">
+                                            <?= __('Repository') ?>:
                                         </div>
                                         <div class="l-unit__stat-col l-unit__stat-col--right">
                                             <b><a href="<?= $plugin_repository ?>"
@@ -226,4 +214,28 @@
             "</div>";
     }
     ?>
+</div>
+
+<div id="vstobjects">
+    <div class="l-separator"></div>
+    <div class="l-center">
+        <div class="l-unit-ft">
+            <table class="data"></table>
+
+            <div class="l-unit__col l-unit__col--left clearfix"></div>
+            <div class="data-count l-unit__col l-unit__col--right clearfix">
+                <?php
+                if (count($plugins) == 1) {
+                    echo "1 " . __("plugin");
+                } else {
+                    echo count($plugins) . " " . __("plugins");
+                }
+                ?>
+                <br><br>
+                <a href="https://github.com/jhmaverick/vestacp-plugin-manager" target="_blank">
+                    VestaCP Plugin Manager <?= Vesta::plugin_manager_info('version') ?>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

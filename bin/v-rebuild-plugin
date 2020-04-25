@@ -11,7 +11,7 @@ if [[ ! "$plugin_name" ]]; then
 elif [[ ! "$plugin_conf" ]]; then
     echo "Plugin does not exist"
     exit 1
-elif [[ "$(echo "$plugin_conf" | awk '{print $5}')" != "true" ]]; then
+elif [[ "$(echo "$plugin_conf" | awk '{print $4}')" != "true" ]]; then
     echo "Plugin $plugin_name is disabled"
     exit 1
 fi

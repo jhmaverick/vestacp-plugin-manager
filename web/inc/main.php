@@ -8,32 +8,55 @@ class Vesta {
     /**
      * Render template
      *
+     * If using a template ".php" add "<?php if (!class_exists('Vesta')) exit; ?>" in the first line to prevent access directly in browser.
+     *
      * @param string $template HTML or full path to the template file.
-     * @param array $vars Variables to extract.
-     * @param array $args <p>Extra arguments.
-     *  * tab - Tab name to top_panel function.
+     * @param array $__args <p>
+     *  Arguments.
+     *
+     *  * string plugin       - Plugin name to use as template directory.
+     *  * string tab          - Tab name to top_panel function. If not defined use global $TAB.
+     *  * string template_dir - Full path to directory. Default: /usr/local/vesta/web.
+     *
+     *  The rest of the arguments will be extracted
      * </p>
      */
-    public static function render($template, $vars = [], $args = []) {
-        global $user, $TAB;
-
-        $tab_name = (isset($args['tab'])) ? $args['tab'] : $TAB;
+    public static function render($template, $__args = []) {
+        $user = $GLOBALS['user'];
+        $TAB = (isset($__args['tab'])) ? $__args['tab'] : $GLOBALS['TAB'];
 
         // Header
         include($_SERVER['DOCUMENT_ROOT'] . '/templates/header.html');
 
         // Panel
-        top_panel(empty($_SESSION['look']) ? $_SESSION['user'] : $_SESSION['look'], $tab_name);
+        top_panel(empty($_SESSION['look']) ? $_SESSION['user'] : $_SESSION['look'], $TAB);
 
-        // Extract variables
-        if (is_array($vars)) {
-            extract($vars, EXTR_SKIP);
+        if (isset($__args['template_dir']) && !empty($__args['template_dir'])) {
+            // Use full path
+            $template_dir = rtrim($__args['template_dir'], '/');
+        } else if (isset($__args['plugin']) && !empty($__args['plugin'])) {
+            // Use the plugin directory
+            $template_dir = $_SERVER['DOCUMENT_ROOT'] . "/plugin/" . trim($__args['plugin'], '/');
+        } else {
+            // Use web root
+            $template_dir = $_SERVER['DOCUMENT_ROOT'];
+        }
+
+        // Remove the arguments from the method and extract the rest
+        if (isset($__args['template'])) unset($__args['template']);
+        if (isset($__args['template_dir'])) unset($__args['template_dir']);
+        if (isset($__args['tab'])) unset($__args['tab']);
+
+        if (is_array($__args) && count($__args) > 0) {
+            extract($__args, EXTR_SKIP);
         }
 
         // Body
-        if (preg_match("/\.(html|php)$/", $template) && file_exists($template)) {
-            @include($template);
-        } else {
+        if (preg_match("/\.(html|php)$/", $template) && file_exists("$template_dir/" . ltrim($template))) {
+            // Get template by path
+            @include_once("$template_dir/" . ltrim($template));
+        } else if (!preg_match("/\.(html|php)$/", $template)) {
+            // Show HTML
             echo $template;
         }
 
@@ -42,6 +65,35 @@ class Vesta {
 
         // Footer
         include($_SERVER['DOCUMENT_ROOT'] . '/templates/footer.html');
+    }
+
+    /**
+     * Layout to show an output from cmd
+     *
+     * @param string $output
+     * @param string $title
+     * @param string $backbutton
+     */
+    public static function render_cmd_output($output, $title = null, $backbutton = null) {
+        $tpl = "<div class=\"l-center units vesta-cmd-output\">\n";
+
+        if (!empty($title)) $tpl .= "<h1>$title</h1>\n";
+
+        $tpl .= "<div class=\"output_console\">\n";
+        $tpl .= "<pre>$output</pre>\n";
+        $tpl .= "</div>\n";
+
+        if (isset($backbutton) && $backbutton !== false) {
+            if (!empty($backbutton)) $_SESSION['back'] = $backbutton;
+
+            $tpl .= "<div class=\"backbutton\">\n" .
+                "<button class=\"button cancel\" onclick=\"location.href='" . $backbutton . "'\">" . __('Back') . "</button>\n" .
+                "</div>\n";
+        }
+
+        $tpl .= "</div>";
+
+        Vesta::render($tpl);
     }
 
     /**
@@ -231,23 +283,56 @@ class Vesta {
     }
 
     /**
-     * Get all plugins installed
+     * Exec command
+     *
+     * @param string $cmd
+     * @param string[] ...$args
+     * @return string|array
      */
-    public static function get_plugins() {
-        exec(VESTA_CMD . "v-list-plugins json", $output);
-        return json_decode(implode('', $output), true);
+    public static function exec($cmd, ...$args) {
+        if (file_exists("/usr/local/vesta/bin/$cmd")) $cmd = VESTA_CMD . "$cmd";
 
+        $final_args = [];
+        foreach ($args as $arg) {
+            if (!empty($arg) && (is_string($arg) || is_numeric($arg))) {
+                $final_args[] = escapeshellarg($arg);
+            }
+        }
+
+        $result = shell_exec($cmd . ' ' . implode(' ', $final_args));
+
+        if (trim(end($final_args), "\"'") == 'json') {
+            return json_decode($result, true);
+        }
+
+        return $result;
     }
 
     /**
-     *  Get plugin data
+     * Get information about plugin manager
      *
-     * @param string $plugin Plugin name.
+     * @param $index
+     * @return mixed|null
      */
-    public static function get_plugin($plugin) {
-        exec(VESTA_CMD . "v-list-plugin \"$plugin\" json", $output);
-        return json_decode(implode('', $output), true);
+    public static function plugin_manager_info($index) {
+        $pm_data = file_get_contents('/usr/local/vesta/plugin-manager/vestacp.json');
+        $pm_data = json_decode($pm_data, true);
 
+        if (!empty($index)) {
+            return (isset($pm_data[$index])) ? $pm_data[$index] : null;
+        } else {
+            return $pm_data;
+        }
+    }
+
+    /**
+     * Checks if it's a plugin page
+     *
+     * @param string $plugin_name
+     * @return bool
+     */
+    public static function is_plugin_page($plugin_name) {
+        return (preg_match("/^\/plugin\/$plugin_name($|\/*)/", $_SERVER['REQUEST_URI']) != false);
     }
 }
 
@@ -368,7 +453,7 @@ Vesta::add_action('panel_init', function () {
         Vesta::add_header_menu('File Manager', '/list/directory/', 'FILEMANAGER', 'all_users', 5);
     if ($_SESSION['SOFTACULOUS'] == 'yes')
         Vesta::add_header_menu('Apps', '/softaculous/', 'all_users', 5);
-    Vesta::add_header_menu('Plugins', '/plugin-manager/list/', 'PLUGINS', 'all_users', 5);
+    Vesta::add_header_menu('Plugins', '/plugin-manager/list/', 'PLUGINS', 'admin_panel', 5);
     Vesta::add_header_menu('Server', '/list/server/', 'SERVER', 'admin_panel', 5);
 
     // Default l-stats menus
@@ -442,7 +527,7 @@ Vesta::add_action('panel_init', function () {
     }
 
     // Add plugins
-    $plugins_list = Vesta::get_plugins();
+    $plugins_list = $plugins = Vesta::exec('v-list-plugins', 'json');
     $total_enabled = 0;
     $total_disabled = 0;
 
@@ -458,7 +543,7 @@ Vesta::add_action('panel_init', function () {
         ['name' => 'Installed', 'value' => count($plugins_list)],
         ['name' => 'Enabled', 'value' => $total_enabled],
         ['name' => 'Disabled', 'value' => $total_disabled],
-    ], 'all_users', 5);
+    ], 'admin_panel', 5);
 }, 5);
 
 // Include each plugin functions in an isolated scope
@@ -468,7 +553,8 @@ function load_plugin($plugin_name) {
     }
 }
 
-foreach (Vesta::get_plugins() as $plugin) {
+$plugins = Vesta::exec('v-list-plugins', 'json');
+foreach ($plugins as $plugin) {
     load_plugin($plugin['name']);
 }
 

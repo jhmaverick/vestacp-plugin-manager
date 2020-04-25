@@ -1,0 +1,13 @@
+{
+  "name": "plugin-manager",
+  "description": "VestaCP Plugin Manager.",
+  "version": "0.1.0",
+  "min-vesta": "0.9.8",
+  "repository": "https://github.com/jhmaverick/vestacp-plugin-manager",
+  "homepage": "https://github.com/jhmaverick/vestacp-plugin-manager#readme",
+  "author": {
+    "name": "João Henrique",
+    "email": "joao_henriquee@outlook.com",
+    "homepage": "https://github.com/jhmaverick/"
+  }
+}

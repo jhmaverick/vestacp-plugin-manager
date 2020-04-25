@@ -9,7 +9,7 @@ if ($_SESSION['user'] != 'admin') {
     exit;
 }
 
-Vesta::render(__DIR__ . "/../templates/list.php", [], ['tab' => $TAB]);
+Vesta::render("/plugin-manager/templates/list.php");
 
 // Back uri
 $_SESSION['back'] = $_SERVER['REQUEST_URI'];
