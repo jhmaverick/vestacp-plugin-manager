@@ -1,212 +1,24 @@
 #!/usr/bin/env bash
 
-source /usr/local/vesta/func/helpers.sh
+source /usr/local/vesta/plugin-manager/func/plugins.sh
 
 plugin_source="$1"
+arg_1="$2"
 
 mkdir -p /usr/local/vesta/plugins
 mkdir -p /usr/local/vesta/web/plugin
 
-get_plugin_name() {
-    plugin_dir="$1"
-
-    if [[ -f "$plugin_dir/vestacp.json" ]]; then
-        plugin_name="$(get_json_index "name" "$plugin_dir/vestacp.json")"
-
-        if [[ "$plugin_name" && "$plugin_name" != "null" ]]; then
-            echo "$plugin_name"
-        fi
-    fi
-}
-
-check_vesta_version() {
-    plugin_dir="$1"
-
-    if [[ -f "$plugin_dir/vestacp.json" ]]; then
-        vesta_version="$(sed -En "s/^VERSION='(.*)'/\1/p" /usr/local/vesta/conf/vesta.conf)"
-        min_version="$(get_json_index "min-vesta" "$plugin_dir/vestacp.json")"
-
-        if [[ "$min_version" && "$min_version" != "null" && "$(php -r "echo version_compare(\"$vesta_version\", \"$min_version\", '<') ? '1' : '';")" ]]; then
-            echo "$min_version"
-        fi
-    fi
-}
-
-install_from_path() {
-    local plugin_source="$1"
-    local create_symlink="$2"
-
-    file_name="$(basename -- "$plugin_source")"
-
-    if [[ ! -d "$plugin_source" ]]; then
-        echo "Invalid source"
-        exit 1
-    fi
-
-    plugin_name="$(get_plugin_name "$plugin_dir")"
-    min_vesta="$(check_vesta_version "$plugin_dir")"
-
-    if [[ ! "$plugin_name" ]]; then
-        echo "The source is not a Vesta plugin"
-        exit 1
-    elif [[ "$min_vesta" ]]; then
-        echo "The plugin needs VestaCP version $min_vesta or higher."
-        exit 1
-    elif [[ -d "/usr/local/vesta/plugins/$plugin_name" ]]; then
-        echo "There is already a plugin with that name"
-        exit 1
-    fi
-
-    if [[ "${create_symlink,,}" == "yes" ]]; then
-        ln -sf "$plugin_source" "/usr/local/vesta/plugins/$plugin_name"
-    else
-        cp -a "$plugin_source" "/usr/local/vesta/plugins/$plugin_name"
-    fi
-
-    configure_plugin "$plugin_name"
-}
-
-install_from_zip() {
-    local plugin_source="$1"
-    local remove_zip_after_install="no"
-
-    file_name="$(basename -- "$plugin_source" | sed -E "s|.zip$||")"
-
-    # Download zip
-    if [[ "$plugin_source" && ! -f "$plugin_source" \
-        && "$(curl -L -I -s "$plugin_source" | grep -E "HTTP/(.*)200")" \
-        && "$(curl -L -I -s "$plugin_source" | grep -E "Content-Type: application/zip")" ]]; then
-        curl -L -J "$plugin_source" -o "/tmp/$file_name.zip"
-        plugin_source="/tmp/$file_name.zip"
-        remove_zip_after_install="yes"
-    fi
-
-    if [[ ! -f "$plugin_source" ]]; then
-        echo "Zip not found"
-        exit 1
-    fi
-
-    # Installation
-    local tmp_dir="/tmp/$(random_string 20)"
-    rm -rf "$tmp_dir"
-    mkdir -p "$tmp_dir"
-    unzip "$plugin_source" -d "$tmp_dir"
-    if [[ "${remove_zip_after_install,,}" == "yes" ]]; then
-        rm -rf "$plugin_source"
-    fi
-
-    # Check if files is in a subdirectory
-    delete_me=""
-    if (( $(ls -1 "$tmp_dir" | wc -l) == 1 )); then
-        sub_dir="$tmp_dir/$(ls -1 "$tmp_dir")"
-
-        if [[ -d "$sub_dir" ]]; then
-            delete_me="$tmp_dir"
-            tmp_dir="$sub_dir"
-        fi
-    fi
-
-    plugin_name="$(get_plugin_name "$tmp_dir")"
-    min_vesta="$(check_vesta_version "$tmp_dir")"
-
-    if [[ ! "$plugin_name" ]]; then
-        echo "The source is not a Vesta plugin"
-        exit 1
-    elif [[ "$min_vesta" ]]; then
-        echo "The plugin needs VestaCP version $min_vesta or higher."
-        exit 1
-    elif [[ -d "/usr/local/vesta/plugins/$plugin_name" ]]; then
-        echo "There is already a plugin with that name"
-        exit 1
-    fi
-
-    # Move to plugins dir
-    mv "$tmp_dir" "/usr/local/vesta/plugins/$plugin_name"
-
-    # Delete empty dir
-    if [[ "$delete_me" ]]; then
-        rm -rf "$delete_me"
-    fi
-
-    configure_plugin "$plugin_name"
-}
-
-install_from_github() {
-    local plugin_source="$(echo "$1" | sed -E "s|.git$||")"
-    repo_branch=""
-
-    if [[ "$(echo "$plugin_source" | grep -E "^https://github.com/[^/]*/[^/]*/tree/[^/]*$")" ]]; then
-        # Get from another branch
-        repo_branch="$(basename -- "$plugin_source")"
-        plugin_source="$(echo "$plugin_source" | sed -En "s|(.*)/tree/.*|\1|p")"
-    elif [[ "$(echo "$plugin_source" | grep -E "^https://github.com/[^/]*/[^/]*$")" ]]; then
-        # Get from master
-        repo_branch="master"
-    else
-        echo "Invalid Github URL"
-        exit 1
-    fi
-
-    if [[ ! "$(curl -L -I -s "$plugin_source" | grep -E "HTTP/(.*)200")" ]]; then
-        echo "Github repository not found"
-        exit 1
-    fi
-
-    install_from_zip "$plugin_source/archive/$repo_branch.zip"
-}
-
-# Check installation
-#
-# * Add in vestacp plugins list
-# * Execute hooks
-# * Add plugin parts in the vesta environment
-configure_plugin() {
-    local plugin_name="$1"
-
-    if [[ ! "$plugin_name" ]]; then
-        exit 1
-    elif [[ ! "$(ls -A "/usr/local/vesta/plugins/$plugin_name")" ]]; then
-        rm -rf "/usr/local/vesta/plugins/$plugin_name"
-        exit 1
-    fi
-
-    # Get plugin data and add installation info
-    plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
-    plugin_data="$(echo "$plugin_data" | jq -r ".enabled = true | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
-
-    # Check if plugin exist in vesta list to keep additional configurations
-    current_plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
-    if [[ "$current_plugin_data" && "$current_plugin_data" != "null" ]]; then
-        # Merge data
-        plugin_data="$(echo "$current_plugin_data $plugin_data" | jq -s ".[0] + .[1]")"
-    fi
-
-    # Update vesta plugins list
-    update_json_index "$plugin_name" "$plugin_data" /usr/local/vesta/conf/plugins.json
-
-    # Check post_install hook
-    if [[ -f "/usr/local/vesta/plugins/$plugin_name/hook/post_install" ]]; then
-        bash "/usr/local/vesta/plugins/$plugin_name/hook/post_install"
-    fi
-
-    # Execute configuration for plugin in the vesta environment
-    /usr/local/vesta/bin/v-rebuild-plugin "$plugin_name"
-
-    # Check if plugin has additional configurations
-    if [[ -f "/usr/local/vesta/plugins/$plugin_name/hook/post_enable" ]]; then
-        bash "/usr/local/vesta/plugins/$plugin_name/hook/post_enable"
-    fi
-
-    echo -e "\nInstallation completed"
-}
-
 if [[ -d "$plugin_source" ]]; then
     # Install from local source
-    install_from_path "$plugin_source" "yes"
+    install_from_path "$plugin_source" "no" "$arg_1"
 elif [[ "$(echo "$plugin_source" | grep -E ".zip$")" ]]; then
     # Install from zip local or in URL
     install_from_zip "$plugin_source"
 else
     # Install from Github repository
-    install_from_github "$plugin_source"
+    github_archive="$(get_from_github "$plugin_source" "archive")"
+
+    if [[ "$github_archive" ]]; then
+        install_from_zip "$github_archive"
+    fi
 fi

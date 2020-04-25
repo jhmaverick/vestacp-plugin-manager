@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-source /usr/local/vesta/func/helpers.sh
+source /usr/local/vesta/plugin-manager/func/helpers.sh
 
 plugin_name="$1"
 
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
-plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name" plain)"
+plugin_conf="$(/usr/local/vesta/plugin-manager/bin/v-list-plugin "$plugin_name" plain)"
 
 if [[ ! "$plugin_name" ]]; then
     echo "Invalid arguments"

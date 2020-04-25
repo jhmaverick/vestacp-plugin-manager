@@ -3,7 +3,7 @@
 plugin_name="$1"
 
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
-plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name" plain)"
+plugin_conf="$(/usr/local/vesta/plugin-manager/bin/v-list-plugin "$plugin_name" plain)"
 
 if [[ ! "$plugin_name" ]]; then
     echo "Invalid arguments"
@@ -22,7 +22,7 @@ if [[ ! -d "$plugin_path" ]]; then
     plugin_repo="$(echo "$plugin_conf" | awk '{print $3}')"
     if [[ "$plugin_repo" && "$plugin_repo" != "null" ]]; then
         echo "Plugin $plugin_name not found, reinstalling via $plugin_repo"
-        /usr/local/vesta/bin/v-add-plugin "$plugin_repo"
+        /usr/local/vesta/plugin-manager/bin/v-add-plugin "$plugin_repo"
     else
         echo "Plugin $plugin_name not found and don't have a repository in their configs."
     fi

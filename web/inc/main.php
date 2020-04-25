@@ -230,10 +230,6 @@ class Vesta {
         }
     }
 
-}
-
-class VestaPlugin {
-
     /**
      * Get all plugins installed
      */
@@ -446,7 +442,7 @@ Vesta::add_action('panel_init', function () {
     }
 
     // Add plugins
-    $plugins_list = VestaPlugin::get_plugins();
+    $plugins_list = Vesta::get_plugins();
     $total_enabled = 0;
     $total_disabled = 0;
 
@@ -472,7 +468,7 @@ function load_plugin($plugin_name) {
     }
 }
 
-foreach (VestaPlugin::get_plugins() as $plugin) {
+foreach (Vesta::get_plugins() as $plugin) {
     load_plugin($plugin['name']);
 }
 

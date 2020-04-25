@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source /usr/local/vesta/func/helpers.sh
+source /usr/local/vesta/plugin-manager/func/helpers.sh
 
 plugin_name="$1"
 
@@ -15,7 +15,7 @@ elif [[ ! -d "$plugin_path" ]]; then
 fi
 
 # Disable plugin to remove from vesta
-/usr/local/vesta/bin/v-disable-plugin "$plugin_name"
+/usr/local/vesta/plugin-manager/bin/v-disable-plugin "$plugin_name"
 
 # Check pre_uninstall hook
 if [[ -f "/usr/local/vesta/plugins/$plugin_name/hook/pre_uninstall" ]]; then

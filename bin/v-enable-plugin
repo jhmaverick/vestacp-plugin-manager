@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-source /usr/local/vesta/func/helpers.sh
+source /usr/local/vesta/plugin-manager/func/helpers.sh
 
 plugin_name="$1"
 
 plugin_path="/usr/local/vesta/plugins/$plugin_name"
-plugin_conf="$(/usr/local/vesta/bin/v-list-plugin "$plugin_name" plain)"
+plugin_conf="$(/usr/local/vesta/plugin-manager/bin/v-list-plugin "$plugin_name" plain)"
 
 if [[ ! "$plugin_name" ]]; then
     echo "Invalid arguments"
@@ -24,7 +24,7 @@ plugin_data="$(update_json_index "enabled" "true" "$plugin_data")"
 update_json_index "$plugin_name" "$plugin_data" /usr/local/vesta/conf/plugins.json
 
 # Reconfigure plugin on vesta
-/usr/local/vesta/bin/v-rebuild-plugin "$plugin_name"
+/usr/local/vesta/plugin-manager/bin/v-rebuild-plugin "$plugin_name"
 
 # Check if plugin has additional configurations
 if [[ -f "$plugin_path/hook/post_enable" ]]; then

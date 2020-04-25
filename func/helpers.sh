@@ -1,66 +1,9 @@
 #!/usr/bin/env bash
 
-# Add item in vesta top menu
+# Generates a random string
 #
-# 1 - Display name
-# 2 - Link
-# 3 - (all|admin|user) Add in panel
-# 4 - (append|prepend) Add menu in position
-vcp_add_top_menu_item() {
-    local display_name="$1"
-    local page_link="$2"
-    local local="${3:-all}"
-    local position="${4:-append}"
-
-    if [[ ! "$display_name" || ! "$page_link" ]]; then
-        echo "Invalid arguments"
-        echo "Args: <menu_name> <page_link> [<local>] [<position>]"
-        return
-    fi
-
-    if [[ "$local" == "all" ]]; then
-        # Add for all users
-        vcp_add_top_menu_item "$display_name" "$page_link" "admin" "$position"
-        vcp_add_top_menu_item "$display_name" "$page_link" "user" "$position"
-    elif [[ "$local" == "admin" || "$local" == "user" ]]; then
-        if grep -q "\"$page_link\"" "/usr/local/vesta/web/templates/$local/panel.html"; then
-            echo 'Plugin link already exist.'
-        else
-            export menu_item="<div class=\"l-menu__item <?php if(\$TAB == \"$display_name\" ) echo \"l-menu__item--active\" ?>\"><a href=\"$page_link\"><?=__(\"$display_name\")?></a></div>"
-
-            if [[ "$position" == "prepend" ]]; then
-                sed -i "/<div class=\"l-menu clearfix.*\">/a $menu_item" "/usr/local/vesta/web/templates/$local/panel.html"
-            else
-                sed -Ezi "s|(.*)(</div>.*<\!\-\- /.l-menu \-\->.*)|\1$menu_item\n\2|" "/usr/local/vesta/web/templates/$local/panel.html"
-            fi
-        fi
-    fi
-}
-
-# Remove item in vesta top menu
-#
-# 1 - Link in href. All itens in top menu with this link will be removed.
-# 2 - (all|admin|user) Remove from.
-vcp_remove_top_menu_item() {
-    local page_link="$1"
-    local local="${2:-all}"
-
-    if [[ ! "$page_link" ]]; then
-        echo "Invalid arguments"
-        echo "Args: <page_link> [<local>]"
-        return
-    fi
-
-    if [[ "$local" == "all" ]]; then
-        # Add for all users
-        vcp_remove_top_menu_item "$page_link" "admin"
-        vcp_remove_top_menu_item "$page_link" "user"
-    elif [[ "$local" == "admin" || "$local" == "user" ]]; then
-        local page_link="$(echo "$page_link" | sed -E "s|/|\\\\/|")"
-        sed -Ei "/<div class=\"l-menu__item.*href=\"$page_link\".*/d" "/usr/local/vesta/web/templates/$local/panel.html"
-    fi
-}
-
+# 1 - Length
+# 2 - Add Special Characters
 random_string() {
     length=${1:-16}
     special_characters="${2:-no}"
@@ -198,6 +141,11 @@ delete_json_index() {
     fi
 }
 
+# Convert multidimensional json to another format
+#
+# 1 - (plain|shell|csv) Format
+# 2 - JSON string or JSON file path. If source is a file the content will be updated.
+# 3 - Indexes. Ex: name|ip|date
 json_to() {
     local format="$1"
     local json_source="$2"
