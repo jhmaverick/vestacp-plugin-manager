@@ -311,10 +311,10 @@ class Vesta {
     /**
      * Get information about plugin manager
      *
-     * @param $index
+     * @param string $index
      * @return mixed|null
      */
-    public static function plugin_manager_info($index) {
+    public static function plugin_manager_info($index = null) {
         $pm_data = file_get_contents('/usr/local/vesta/plugin-manager/vestacp.json');
         $pm_data = json_decode($pm_data, true);
 

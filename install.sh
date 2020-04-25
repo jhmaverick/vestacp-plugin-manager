@@ -12,9 +12,9 @@ elif [[ -d /usr/local/vesta/plugin-manager && "${action,,}" != "update" ]]; then
     echo "Plugin manager is already installed."
     exit 1
 elif [[ ! "$(command -v jq)" ]]; then
-    echo -e "You must install the \"jq\" library before proceeding.\n" >&2
-    echo "Debian: sudo apt-get -y install jq" >&2
-    echo "CentOS: sudo yum -y install jq" >&2
+    echo -e "You must install the \"jq\" library before proceeding.\n"
+    echo "Debian: sudo apt-get -y install jq"
+    echo "CentOS: sudo yum -y install jq"
     exit 1
 fi
 

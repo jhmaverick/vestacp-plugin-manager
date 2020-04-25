@@ -71,6 +71,29 @@ If the plugin does not have a web interface it will not need the "web" directory
 * **/hook/pre_uninstall** - Run after delete the symlinks and before delete plugin files.
 
 
+## vestacp.json
+
+```json5
+{
+  "name": "plugin-name",
+  "description": "Plugin description",
+  "version": "0.0.1",
+  "min-vesta": "0.9.8",
+  "repository": "https://github.com/jhmaverick/plugin-name",
+  "homepage": "https://github.com/jhmaverick/plugin-name#readme",
+  "author": {
+    "name": "João Henrique",
+    "email": "joao_henriquee@outlook.com",
+    "homepage": "https://github.com/jhmaverick/"
+  }
+}
+```
+
+* **name:** The plugin name. Will be used in the plugin directory and the plugin identification. Only include lowercase alphanumeric, dashes, and underscores characters.
+* **repository:** The plugin repository. Used to download updates in `v-update-plugin`.
+* **min-vesta:** Minimum vesta version.
+
+
 ## Actions, filters and functions
 
 ### Actions
@@ -83,7 +106,6 @@ If the plugin does not have a web interface it will not need the "web" directory
 * **menu:** Loaded at the end of the ".l-stats". Only displayed if "vestoid-theme" is installed.
 * **pre_load_template:** Loaded before include template.
 * **footer:** Loaded in the beginning of the "footer.html".
-* **:**
 
 ### Filters
 * **css:** List of css that will be inserted in the head tag.
@@ -91,7 +113,6 @@ If the plugin does not have a web interface it will not need the "web" directory
 * **header_menu:** Items that will be inserted in the header by the action "header_menu".
 * **menu:** Items that will be inserted in the "l-stats" tag by the action "menu".
 * **body_class:** List of classes that will be called and treated "body_class" action.
-
 
 ### Functions
 
@@ -187,26 +208,11 @@ Return: user_panel|admin_panel|external
 Args:
 * string $plugin_name
 
+#### Vesta::plugin_manager_info
+Args:
+* string $index Optional
 
-## vestacp.json
-
-```json5
-{
-  "name": "plugin-name",
-  "description": "Plugin description",
-  "version": "0.0.1",
-  "min-vesta": "0.9.8",
-  "repository": "https://github.com/jhmaverick/plugin-name",
-  "homepage": "https://github.com/jhmaverick/plugin-name#readme",
-  "author": {
-    "name": "João Henrique",
-    "email": "joao_henriquee@outlook.com",
-    "homepage": "https://github.com/jhmaverick/"
-  }
-}
-```
-
-* **name:** The plugin name. Will be used in the plugin directory and the plugin identification. Only include lowercase alphanumeric, dashes, and underscores characters.
-* **repository:** The plugin repository. Used to download updates in `v-update-plugin`.
-* **min-vesta:** Minimum vesta version.
+#### Vesta::is_plugin_page
+Args:
+* string $plugin_name
 

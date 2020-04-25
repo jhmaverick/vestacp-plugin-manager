@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-curl -sL https://raw.githubusercontent.com/jhmaverick/vestacp-plugin-manager/master/install.sh | bash -
+curl -sL https://raw.githubusercontent.com/jhmaverick/vestacp-plugin-manager/master/install.sh -o /tmp/plugin-manager.sh
+bash /tmp/plugin-manager.sh update

@@ -7,7 +7,7 @@
             <table>
                 <tr>
                     <td class="step-right">
-                        <a class="vst" href="/plugin-manager/update-sys-plugins/" target="_blank"><?=__('Update Plugin Manager')?> <i></i></a>
+                        <a class="vst" href="/plugin-manager/update-sys-plugins/"><?=__('Update Plugin Manager')?> <i></i></a>
                     </td>
                 </tr>
             </table>
