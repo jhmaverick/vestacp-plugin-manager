@@ -25,6 +25,11 @@ curl -L -J "https://github.com/jhmaverick/vestacp-plugin-manager/archive/master.
 unzip -q "/tmp/vestacp-plugin-manager.zip" -d "/tmp"
 rm -rf "/tmp/vestacp-plugin-manager.zip"
 
+if [[ ! -f /tmp/vestacp-plugin-manager-master/vestacp.json ]]; then
+    echo "Installation failed."
+    exit 1
+fi
+
 # Check Vesta version
 vesta_version="$(sed -En "s/^VERSION='(.*)'/\1/p" /usr/local/vesta/conf/vesta.conf)"
 min_vesta="$(jq -r '."min-vesta"' /tmp/vestacp-plugin-manager-master/vestacp.json)"
