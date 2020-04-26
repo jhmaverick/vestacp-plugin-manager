@@ -83,9 +83,7 @@ class Vesta {
         $tpl .= "<pre>$output</pre>\n";
         $tpl .= "</div>\n";
 
-        if (isset($backbutton) && $backbutton !== false) {
-            if (!empty($backbutton)) $_SESSION['back'] = $backbutton;
-
+        if (isset($backbutton) && !empty($backbutton)) {
             $tpl .= "<div class=\"backbutton\">\n" .
                 "<button class=\"button cancel\" onclick=\"location.href='" . $backbutton . "'\">" . __('Back') . "</button>\n" .
                 "</div>\n";
@@ -286,7 +284,7 @@ class Vesta {
      * Exec command
      *
      * @param string $cmd
-     * @param string[] ...$args
+     * @param mixed ...$args
      * @return string|array
      */
     public static function exec($cmd, ...$args) {
@@ -453,7 +451,7 @@ Vesta::add_action('panel_init', function () {
         Vesta::add_header_menu('File Manager', '/list/directory/', 'FILEMANAGER', 'all_users', 5);
     if ($_SESSION['SOFTACULOUS'] == 'yes')
         Vesta::add_header_menu('Apps', '/softaculous/', 'all_users', 5);
-    Vesta::add_header_menu('Plugins', '/plugin-manager/list/', 'PLUGINS', 'admin_panel', 5);
+    Vesta::add_header_menu('Plugins', '/plugin-manager/', 'PLUGINS', 'admin_panel', 5);
     Vesta::add_header_menu('Server', '/list/server/', 'SERVER', 'admin_panel', 5);
 
     // Default l-stats menus
@@ -539,7 +537,7 @@ Vesta::add_action('panel_init', function () {
         }
     }
 
-    Vesta::add_menu('Plugins', '/plugin-manager/list/', 'Plugins', [
+    Vesta::add_menu('Plugins', '/plugin-manager/', 'Plugins', [
         ['name' => 'Installed', 'value' => count($plugins_list)],
         ['name' => 'Enabled', 'value' => $total_enabled],
         ['name' => 'Disabled', 'value' => $total_disabled],

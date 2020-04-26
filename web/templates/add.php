@@ -10,6 +10,6 @@
         <input type="hidden" name="action" value="install"/>
         <button class="button confirm" type="submit"><?= __("Install") ?></button>
         <button class="button cancel" type="button"
-                onclick="location.href='/plugin-manager/list/'"><?= __('Back') ?></button>
+                onclick="location.href='/plugin-manager/'"><?= __('Back') ?></button>
     </form>
 </div>

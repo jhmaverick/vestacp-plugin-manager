@@ -32,7 +32,7 @@ if (!empty($action) && !empty($plugin)) {
             break;
 
         default:
-            header("Location: /plugin-manager/list/");
+            header("Location: /plugin-manager/");
             exit;
     }
 
@@ -43,6 +43,6 @@ if (!empty($action) && !empty($plugin)) {
     }
 }
 
-header("Location: /plugin-manager/list/");
+header("Location: /plugin-manager/");
 exit;
 

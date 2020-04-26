@@ -13,5 +13,5 @@ if ($_SESSION['user'] != 'admin') {
 }
 
 $output = Vesta::exec('v-update-sys-plugins');
-Vesta::render_cmd_output($output, 'Teste', "/plugin-manager/list/");
+Vesta::render_cmd_output($output, null, "/plugin-manager/");
 echo '<script>window.history.pushState("","","/plugin-manager/update-sys-plugins/");</script>';
