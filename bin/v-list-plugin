@@ -2,7 +2,7 @@
 
 source /usr/local/vesta/plugin-manager/func/helpers.sh
 
-plugin_name="$1"
+plugin_name="$(echo "$1" | awk '{gsub(/^[ \t]+| [ \t]+$/,""); print $0 }')"
 format="${2:-shell}"
 
 plugins_list="$(cat "/usr/local/vesta/conf/plugins.json")"

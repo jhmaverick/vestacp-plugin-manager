@@ -22,7 +22,7 @@ mkdir -p /usr/local/vesta/plugins
 
 rm -rf "/tmp/vestacp-plugin-manager-master"
 curl -L -J "https://github.com/jhmaverick/vestacp-plugin-manager/archive/master.zip" -o "/tmp/vestacp-plugin-manager.zip"
-unzip "/tmp/vestacp-plugin-manager.zip" -d "/tmp"
+unzip -q "/tmp/vestacp-plugin-manager.zip" -d "/tmp"
 rm -rf "/tmp/vestacp-plugin-manager.zip"
 
 # Check Vesta version

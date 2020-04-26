@@ -6,7 +6,7 @@ get_plugin_name_from_source() {
     local plugin_dir="$1"
 
     if [[ -f "$plugin_dir/vestacp.json" ]]; then
-        plugin_name="$(get_json_index "name" "$plugin_dir/vestacp.json")"
+        local plugin_name="$(get_json_index "name" "$plugin_dir/vestacp.json")"
 
         if [[ "$plugin_name" && "$plugin_name" != "null" && "$plugin_name" != "plugin-manager" && "$(echo "$plugin_name" | grep -E "^[a-z0-9_\-]+$")" ]]; then
             echo "$plugin_name"
@@ -19,8 +19,8 @@ check_vesta_min_version() {
     local plugin_dir="$1"
 
     if [[ -f "$plugin_dir/vestacp.json" ]]; then
-        vesta_version="$(sed -En "s/^VERSION='(.*)'/\1/p" /usr/local/vesta/conf/vesta.conf)"
-        min_version="$(get_json_index "min-vesta" "$plugin_dir/vestacp.json")"
+        local vesta_version="$(sed -En "s/^VERSION='(.*)'/\1/p" /usr/local/vesta/conf/vesta.conf)"
+        local min_version="$(get_json_index "min-vesta" "$plugin_dir/vestacp.json")"
 
         if [[ "$min_version" && "$min_version" != "null" && "$(php -r "echo version_compare(\"$vesta_version\", \"$min_version\", '<') ? '1' : '';")" ]]; then
             echo "$min_version"
@@ -72,7 +72,7 @@ get_from_github() {
     elif [[ "$info" == "raw_path" ]]; then
         echo "https://raw.githubusercontent.com/$repo_owner/$repo_name/$repo_branch"
     elif [[ "$info" ]]; then
-        plugin_conf="$(curl "https://raw.githubusercontent.com/$repo_owner/$repo_name/$repo_branch/vestacp.json" 2>/dev/null)"
+        local plugin_conf="$(curl "https://raw.githubusercontent.com/$repo_owner/$repo_name/$repo_branch/vestacp.json" 2>/dev/null)"
 
         if [[ "$(echo "$plugin_conf" | jq -r '.' 2>/dev/null)" ]]; then
             get_json_index "$info" "$plugin_conf"
@@ -82,14 +82,14 @@ get_from_github() {
 
 # If exist an update return version number
 check_update() {
-    local plugin_name="$1"
+    local plugin_name="$(echo "$1" | awk '{gsub(/^[ \t]+| [ \t]+$/,""); print $0 }')"
     local new_version_path="$2"
 
     local new_version=""
 
     if [[ -f "/usr/local/vesta/plugins/$plugin_name/vestacp.json" ]]; then
-        version="$(get_json_index "version" "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
-        plugin_repository="$(get_json_index "repository" "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
+        local version="$(get_json_index "version" "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
+        local plugin_repository="$(get_json_index "repository" "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
 
         if [[ "$new_version_path" && -f "$new_version_path/vestacp.json" ]]; then
             new_version="$(get_json_index "version" "$new_version_path/vestacp.json")"
@@ -109,15 +109,15 @@ install_from_path() {
     local update_if_exist="$2"
     local create_symlink="$3"
 
-    file_name="$(basename -- "$plugin_source")"
+    local file_name="$(basename -- "$plugin_source")"
 
     if [[ ! -d "$plugin_source" ]]; then
         echo "Invalid source"
         exit 1
     fi
 
-    plugin_name="$(get_plugin_name_from_source "$plugin_source")"
-    min_vesta="$(check_vesta_min_version "$plugin_source")"
+    local plugin_name="$(get_plugin_name_from_source "$plugin_source")"
+    local min_vesta="$(check_vesta_min_version "$plugin_source")"
 
     if [[ ! "$plugin_name" ]]; then
         echo "The source is not a Vesta plugin"
@@ -170,7 +170,7 @@ install_from_zip() {
     local tmp_dir="/tmp/$(random_string 20)"
     rm -rf "$tmp_dir"
     mkdir -p "$tmp_dir"
-    unzip "$plugin_source" -d "$tmp_dir"
+    unzip -q "$plugin_source" -d "$tmp_dir"
     if [[ "${remove_zip_after_install,,}" == "yes" ]]; then
         rm -rf "$plugin_source"
     fi
@@ -222,7 +222,7 @@ install_from_zip() {
 # * Execute hooks
 # * Add plugin parts in the vesta environment
 configure_plugin() {
-    local plugin_name="$1"
+    local plugin_name="$(echo "$1" | awk '{gsub(/^[ \t]+| [ \t]+$/,""); print $0 }')"
     local type_config="install"
 
     if [[ ! "$plugin_name" ]]; then
@@ -233,11 +233,11 @@ configure_plugin() {
     fi
 
     # Get plugin data and add installation info
-    plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
+    local plugin_data="$( get_json "/usr/local/vesta/plugins/$plugin_name/vestacp.json")"
     plugin_data="$(echo "$plugin_data" | jq -r ".enabled = true | .date = \"$(date +'%Y-%m-%d %H:%M:%S')\"")"
 
     # Check if plugin exist in vesta list to keep additional configurations
-    current_plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
+    local current_plugin_data="$(get_json_index "$plugin_name" /usr/local/vesta/conf/plugins.json)"
     if [[ "$current_plugin_data" && "$current_plugin_data" != "null" ]]; then
         type_config="update"
 

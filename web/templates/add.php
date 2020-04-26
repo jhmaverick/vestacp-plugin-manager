@@ -1,7 +1,7 @@
 <?php if (!class_exists('Vesta')) exit; ?>
 <div class="l-center units vesta-plugins-add">
     <form action="index.php" method="post">
-        <h1>Install Plugin</h1>
+        <h1><?= __('Plugin Installer') ?></h1>
 
         <p class="vst-text"><b><?= __("Github repository") ?></b></p>
         <input type="text" class="vst-input" name="plugin-url" required/>

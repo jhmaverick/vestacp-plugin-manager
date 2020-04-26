@@ -90,7 +90,7 @@ body.list_server_info .l-header .l-menu .l-menu__item,
 .vesta-cmd-output .output_console {
     background: #3a3a3a;
     color: #FFF;
-    padding: 14px;
+    padding: 20px 40px;
     overflow-x: auto;
 }
 
