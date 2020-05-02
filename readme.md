@@ -41,6 +41,22 @@ This script can also be executed if any vesta update removes the changes.
 
 To remove the changes and delete the plugin manager, run `/usr/local/vesta/plugin-manager/uninstall.sh`
 
+
+## Some Plugins
+
+* Alternative theme for Vesta: [Vestoid Theme](https://github.com/jhmaverick/vestoid-theme)
+* Automatic installer for Wordpress and Moodle: [VestaCP Web Apps](https://github.com/jhmaverick/vestacp-web-apps)
+* List mail domains and accounts in a single page: [Single Mail List](https://github.com/jhmaverick/single-mail-list)
+
+
+## TODO
+
+-[ ] Create a version of the default Vesta pages (Web, Domain, DNS, Server, ...) in plugin format with Actions and Filters to enable integration with other plugins and be a basis for the community to create their versions.
+-[ ] Add option to check update before installing.
+-[ ] Add Methods to render blocks.
+-[ ] Add directory for data storage by plugins.
+
+
 ![screenshot.png](screenshot.png)
 
 You can see information about creating plugins on the [project wiki](https://github.com/jhmaverick/vestacp-plugin-manager/wiki).
