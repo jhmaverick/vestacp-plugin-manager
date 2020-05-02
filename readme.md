@@ -51,10 +51,10 @@ To remove the changes and delete the plugin manager, run `/usr/local/vesta/plugi
 
 ## TODO
 
--[ ] Create a version of the default Vesta pages (Web, Domain, DNS, Server, ...) in plugin format with Actions and Filters to enable integration with other plugins and be a basis for the community to create their versions.
--[ ] Add option to check update before installing.
--[ ] Add Methods to render blocks.
--[ ] Add directory for data storage by plugins.
+- [ ] Create a version of the default Vesta pages (Web, Domain, DNS, Server, ...) in plugin format with Actions and Filters to enable integration with other plugins and be a basis for the community to create their versions.
+- [ ] Add option to check update before installing.
+- [ ] Add Methods to render blocks.
+- [ ] Add directory for data storage by plugins.
 
 
 ![screenshot.png](screenshot.png)
