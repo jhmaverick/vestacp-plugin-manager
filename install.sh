@@ -70,6 +70,9 @@ ln -sf /usr/local/vesta/plugin-manager/web /usr/local/vesta/web/plugin-manager
 bash /usr/local/vesta/plugin-manager/reconfigure-vesta-web.sh
 
 # Install plugin modern theme
-/usr/local/vesta/plugin-manager/bin/v-add-plugin "https://github.com/jhmaverick/vestoid-theme"
+if [[ "${action,,}" != "update" ]]; then
+    echo "Installing the vestoid-theme plugin"
+    /usr/local/vesta/plugin-manager/bin/v-add-plugin "https://github.com/jhmaverick/vestoid-theme" >/dev/null
+fi
 
 echo -e "\nInstallation completed"

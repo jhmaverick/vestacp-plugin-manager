@@ -22,6 +22,7 @@
         <?php
         $i = 0;
         $plugins = Vesta::exec('v-list-plugins', 'json');
+        ksort($plugins);
         foreach ($plugins as $plugin) {
             $plugin_name = $plugin['name'];
             $plugin_version = (isset($plugin['version']) && is_string($plugin['version'])) ? $plugin['version'] : "";

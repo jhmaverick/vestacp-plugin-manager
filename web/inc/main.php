@@ -547,7 +547,10 @@ Vesta::add_action('panel_init', function () {
 // Include each plugin functions in an isolated scope
 function load_plugin($plugin_name) {
     if (file_exists("/usr/local/vesta/web/plugin/$plugin_name/functions.php")) {
-        include_once "/usr/local/vesta/web/plugin/$plugin_name/functions.php";
+        try {
+            include_once "/usr/local/vesta/web/plugin/$plugin_name/functions.php";
+        } catch (Exception $e) {
+        }
     }
 }
 
