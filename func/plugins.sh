@@ -154,8 +154,7 @@ install_from_zip() {
 
     # Download zip
     if [[ "$plugin_source" && ! -f "$plugin_source" \
-        && "$(curl -L -I -s "$plugin_source" | grep -E "HTTP/(.*)200")" \
-        && "$(curl -L -I -s "$plugin_source" | grep -E "Content-Type: application/zip")" ]]; then
+        && "$(curl -L -I -s "$plugin_source" | grep -E "HTTP/(.*)200")" ]]; then
         curl -L -J "$plugin_source" -o "/tmp/$file_name.zip"
         plugin_source="/tmp/$file_name.zip"
         remove_zip_after_install="yes"
