@@ -1,3 +1,5 @@
+**After Vesta 1.0 update the tool is no longer supported.**
+
 # VestaCP Plugin Manager
 
 This script adds to vesta the ability to work with plugins.\
